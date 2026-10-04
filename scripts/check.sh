@@ -10,6 +10,11 @@ if [ ! -f .cache/globalTypes.d.luau ]; then
 fi
 
 lune run tests/run
+lune run scripts/export-strings .cache/Strings.csv > /dev/null
+if ! cmp -s .cache/Strings.csv localization/Strings.csv; then
+	echo "localization/Strings.csv is out of date: run 'lune run scripts/export-strings'"
+	exit 1
+fi
 stylua --check src tests
 rojo build -o .cache/check.rbxl > /dev/null
 rojo sourcemap -o .cache/sourcemap.json > /dev/null

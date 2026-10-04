@@ -1,5 +1,7 @@
 -- Every player-facing string, by key. The server sends keys (plus variables) and the client
 -- looks them up, so all display text can be localized in one place.
+-- English lives here; other languages come from the LocalizationTable exported from this file
+-- (scripts/export-strings.luau) via a translator the client plugs in with setTranslator.
 
 local Strings = {}
 
@@ -217,8 +219,21 @@ local EN: { [string]: string } = {
 
 Strings.EN = EN
 
+local translator: ((key: string, vars: { [string]: any }) -> string?)? = nil
+
+-- Plugs in a translator (the client wraps Roblox's Translator). It returns nil to fall back to English.
+function Strings.setTranslator(fn: (key: string, vars: { [string]: any }) -> string?)
+	translator = fn
+end
+
 -- Fills {placeholders} from vars. Unknown keys come back as the key so missing text is obvious.
 function Strings.get(key: string, vars: { [string]: any }?): string
+	if translator then
+		local translated = translator(key, vars or {})
+		if translated then
+			return translated
+		end
+	end
 	local text = EN[key] or key
 	if vars then
 		text = text:gsub("{(%w+)}", function(name)

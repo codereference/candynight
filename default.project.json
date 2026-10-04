@@ -32,6 +32,11 @@
         }
       }
     },
+    "LocalizationService": {
+      "Strings": {
+        "$path": "localization/Strings.csv"
+      }
+    },
     "Lighting": {
       "$properties": {
         "Brightness": 2.5,

@@ -22,6 +22,17 @@ local Format = require(ReplicatedStorage.Shared.Format)
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
+-- Show every string in the player's language when the LocalizationTable has it.
+local LocalizationService = game:GetService("LocalizationService")
+local Strings = require(ReplicatedStorage.Shared.Strings)
+local gotTranslator, translator = pcall(LocalizationService.GetTranslatorForPlayerAsync, LocalizationService, player)
+if gotTranslator and translator.LocaleId:sub(1, 2) ~= "en" then
+	Strings.setTranslator(function(key, vars)
+		local ok, text = pcall(translator.FormatByKey, translator, key, vars)
+		return if ok then text else nil
+	end)
+end
+
 Toasts.mount(playerGui)
 WelcomeBack.mount(playerGui)
 Atmosphere.start()
