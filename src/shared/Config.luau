@@ -225,6 +225,11 @@ return {
 		RELEASE = { cash = 1000 },
 	},
 
+	-- Extra admins besides the owners in Monetization.ownerIds (user ids).
+	Admin = {
+		extraIds = {},
+	},
+
 	-- Gamepasses (see Entitlements). ids are Roblox gamepass ids; 0 = not created yet (see #28).
 	Monetization = {
 		ownerIds = { 5224066822 }, -- Sep_1264: every pass free, Owner tag, admin panel

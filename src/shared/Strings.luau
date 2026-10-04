@@ -168,6 +168,20 @@ local EN: { [string]: string } = {
 	["Cosmetic.Hearts"] = "Hearts",
 	["Cosmetic.RainbowTrail"] = "Rainbow",
 
+	["Admin.Button"] = "👑 Admin",
+	["Admin.Title"] = "👑 Admin Panel",
+	["Admin.Target"] = "Player (blank = me)",
+	["Admin.GiveCash"] = "Give {cash}",
+	["Admin.SkipPhase"] = "Skip to next phase",
+	["Admin.Spawn"] = "Spawn 5 shadows",
+	["Admin.BloodMoon"] = "Blood Moon next night",
+	["Admin.Streak"] = "Streak +5",
+	["Admin.RepairAll"] = "Repair my defenses",
+	["Admin.Reset"] = "Reset player data",
+	["Admin.Done"] = "✅ Done",
+	["Admin.Failed"] = "❌ Couldn't do that ({reason})",
+	["Admin.ResetKick"] = "Your data was reset by an admin. Rejoin to start fresh!",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 

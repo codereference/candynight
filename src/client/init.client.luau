@@ -14,6 +14,7 @@ local DailyPanel = require(script.DailyPanel)
 local CodesPanel = require(script.CodesPanel)
 local StorePanel = require(script.StorePanel)
 local StylePanel = require(script.StylePanel)
+local AdminPanel = require(script.AdminPanel)
 local Toasts = require(script.Toasts)
 local Format = require(ReplicatedStorage.Shared.Format)
 
@@ -31,6 +32,7 @@ DailyPanel.mount(playerGui)
 CodesPanel.mount(playerGui)
 StorePanel.mount(playerGui)
 StylePanel.mount(playerGui)
+AdminPanel.mount(playerGui)
 
 local cash = player:WaitForChild("leaderstats"):WaitForChild("Cash") :: IntValue
 CashHud.mount(playerGui, cash, Format.cash)

@@ -24,6 +24,7 @@ local Events = require(ReplicatedStorage.Shared.Rules.Events)
 local Monetization = require(script.Monetization)
 local Products = require(script.Products)
 local Style = require(script.Style)
+local AdminService = require(script.AdminService)
 local Net = require(ReplicatedStorage.Shared.Net)
 
 local plots = Plots.new(Config.Plots.count)
@@ -62,6 +63,7 @@ Bonuses.start()
 Monetization.start()
 Products.start(runtimeOf)
 Style.start(runtimeOf, PlotRuntime.weaponsGiven, Monetization.perksChanged)
+AdminService.start(runtimeOf)
 
 local function onPlayerAdded(player: Player)
 	local session = Sessions.start(player) -- yields while the save loads
@@ -165,6 +167,14 @@ Sessions.started.Event:Connect(applyEventBoost)
 World.phaseChanged.Event:Connect(function(phase, night)
 	if phase == "Night" then
 		currentEvent = Events.forNight(Config.Events, night, os.time())
+		if AdminService.forcedEvent then
+			for _, event in Config.Events do
+				if event.id == AdminService.forcedEvent then
+					currentEvent = event
+				end
+			end
+			AdminService.forcedEvent = nil
+		end
 		NightDirector.modifiers = if currentEvent then currentEvent.modifiers else {}
 		NightDirector.startNight(runtimes, night)
 	else
