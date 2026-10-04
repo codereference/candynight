@@ -12,6 +12,7 @@ local PlotView = require(script.PlotView)
 local Sessions = require(script.Sessions)
 local Strings = require(ReplicatedStorage.Shared.Strings)
 local World = require(script.World)
+local NightDirector = require(script.NightDirector)
 
 local plots = Plots.new(Config.Plots.count)
 local runtimes = {}
@@ -59,8 +60,25 @@ Players.PlayerRemoving:Connect(function(player)
 	Sessions.stop(player)
 end)
 
+World.phaseChanged.Event:Connect(function(phase, night)
+	if phase == "Night" then
+		NightDirector.startNight(runtimes, night)
+	else
+		NightDirector.endNight(runtimes)
+	end
+end)
+
+-- Whoever lands the final hit earns a little bounty.
+NightDirector.creatureDefeated.Event:Connect(function(_runtime, byPlayer: Player?)
+	local session = byPlayer and Sessions.get(byPlayer)
+	if session then
+		session:earn(Config.Creatures.bounty + World.night())
+	end
+end)
+
 RunService.Heartbeat:Connect(function(dt)
 	World.tick(dt)
+	NightDirector.tick(dt)
 	for _, runtime in runtimes do
 		runtime:tick(dt)
 	end

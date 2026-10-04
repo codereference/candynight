@@ -86,4 +86,14 @@ function Shop:serve()
 	return { kind = "CustomerServed", customerId = id, cash = self:saleValue() }
 end
 
+-- A customer was scared off before being served. Returns false if they weren't in line.
+function Shop:loseCustomer(id: number): boolean
+	local index = table.find(self.queue, id)
+	if index == nil then
+		return false
+	end
+	table.remove(self.queue, index)
+	return true
+end
+
 return Shop

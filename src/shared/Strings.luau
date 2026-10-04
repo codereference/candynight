@@ -14,6 +14,14 @@ local EN: { [string]: string } = {
 	["Clock.Day"] = "☀️ Day {n}  {time}",
 	["Clock.Night"] = "🌙 Night {n}  {time}",
 
+	["Night.Streak"] = "🔥 Streak {n}",
+	["Night.Meter"] = "😱 Scared away: {lost} / {allowed}",
+	["Night.Survived"] = "You survived the night! 🌅",
+	["Night.SurvivedDetail"] = "Your streak is now {streak}. Keep those customers safe!",
+	["Night.Failed"] = "Oh no! 😱",
+	["Night.FailedDetail"] = "Too many customers got scared away. You lost {cash} and {broken} defenses broke.",
+	["Ui.Ok"] = "OK",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 

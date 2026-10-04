@@ -12,7 +12,7 @@ function CustomerView.new(walkSpeed: number, parent: Instance)
 	return setmetatable({ walkSpeed = walkSpeed, parent = parent, customers = {} }, CustomerView)
 end
 
-function CustomerView:_walk(id: number, ground: CFrame, onArrived: (() -> ())?)
+function CustomerView:_walk(id: number, ground: CFrame, onArrived: (() -> ())?, speedScale: number?)
 	local customer = self.customers[id]
 	if not customer then
 		return
@@ -29,7 +29,7 @@ function CustomerView:_walk(id: number, ground: CFrame, onArrived: (() -> ())?)
 	end
 	local tween = TweenService:Create(
 		customer.driver,
-		TweenInfo.new(distance / self.walkSpeed, Enum.EasingStyle.Linear),
+		TweenInfo.new(distance / (self.walkSpeed * (speedScale or 1)), Enum.EasingStyle.Linear),
 		{ Value = to }
 	)
 	customer.tween = tween
@@ -67,8 +67,8 @@ function CustomerView:layout(queue: { number }, slotFor: (number) -> CFrame)
 	end
 end
 
--- Walks a customer off to `exit` showing `bubble`, then removes them.
-function CustomerView:leave(id: number, exit: CFrame, bubble: string?)
+-- Walks a customer off to `exit` showing `bubble`, then removes them. speedScale > 1 to run.
+function CustomerView:leave(id: number, exit: CFrame, bubble: string?, speedScale: number?)
 	local customer = self.customers[id]
 	if not customer then
 		return
@@ -76,7 +76,7 @@ function CustomerView:leave(id: number, exit: CFrame, bubble: string?)
 	NpcModel.setBubble(customer.model, bubble or "😋")
 	self:_walk(id, exit, function()
 		self:_remove(id)
-	end)
+	end, speedScale)
 end
 
 function CustomerView:_remove(id: number)

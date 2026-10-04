@@ -60,6 +60,30 @@ return {
 		musicVolume = 0.4,
 	},
 
+	-- Shadow creatures. Later nights scale count, health and speed (see Wave.plan).
+	Creatures = {
+		baseCount = 3,
+		countPerNight = 1,
+		maxCount = 20,
+		baseHealth = 40,
+		healthGrowth = 0.2,
+		speed = 7,
+		speedGrowth = 0.03,
+		spawnWindow = 0.6, -- creatures arrive across the first 60% of the night
+		catchRadius = 3,
+		restAfterScare = 1.5,
+		bounty = 6, -- cash for defeating one, plus 1 per night number
+	},
+
+	-- Surviving a night (see NightOutcome).
+	Night = {
+		lossShare = 0.5, -- share of the night's customers you may lose on a 0 streak
+		lossShareStep = 0.04, -- less allowed per night of streak
+		minLossShare = 0.1,
+		failCashShare = 0.25,
+		failBrokenDefenses = 2,
+	},
+
 	Customer = {
 		walkSpeed = 10, -- studs per second
 		queueSpacing = 4, -- studs between customers in line
