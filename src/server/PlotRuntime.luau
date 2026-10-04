@@ -148,6 +148,7 @@ function PlotRuntime:release()
 	self.session = nil
 	self.shop = nil
 	self.outcome = nil
+	TurretDirector.overdrive[self] = nil
 	table.clear(self.defenseModels)
 	self.customers:clear()
 	self.buttons:clear()

@@ -71,6 +71,9 @@ function Sessions.stop(player: Player)
 	if session then
 		active[player] = nil
 		closing += 1
+		while session.saving do
+			task.wait() -- let an in-flight autosave finish so the release is the last write
+		end
 		session:collectOffline()
 		session:_writeBack()
 		session.cashChanged:Destroy()
@@ -94,9 +97,16 @@ function Session:_writeBack()
 	self.profile.lastOnline = os.time()
 end
 
+-- One save at a time per player; a save requested while another is running is skipped.
 function Session:saveNow(): boolean
+	if self.saving then
+		return false
+	end
+	self.saving = true
 	self:_writeBack()
-	return self.save:save()
+	local ok = self.save:save()
+	self.saving = false
+	return ok
 end
 
 function Session:syncCash()
@@ -144,7 +154,7 @@ end
 task.spawn(function()
 	while true do
 		task.wait(Config.Save.autosaveSeconds)
-		for _, session in active do
+		for _, session in table.clone(active) do
 			task.spawn(session.saveNow, session)
 		end
 	end

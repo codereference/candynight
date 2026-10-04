@@ -91,9 +91,6 @@ local function onPlayerAdded(player: Player)
 end
 
 Players.PlayerAdded:Connect(onPlayerAdded)
-for _, player in Players:GetPlayers() do -- anyone who joined before this script ran
-	onPlayerAdded(player)
-end
 
 Players.PlayerRemoving:Connect(function(player)
 	local index = plots:release(player.UserId)
@@ -102,6 +99,9 @@ Players.PlayerRemoving:Connect(function(player)
 	end
 	Weapons.forget(player)
 	Sessions.stop(player)
+	-- Destroying the Player drops every connection made on it (CharacterAdded etc.) and the
+	-- sessions/runtimes those closures hold, so nothing leaks per join.
+	player:Destroy()
 end)
 
 local function isCell(n: any): boolean
@@ -208,3 +208,8 @@ RunService.Heartbeat:Connect(function(dt)
 		runtime:tick(dt)
 	end
 end)
+
+-- Anyone who joined before this script ran. Spawned so a slow save load never stalls startup.
+for _, player in Players:GetPlayers() do
+	task.spawn(onPlayerAdded, player)
+end

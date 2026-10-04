@@ -25,12 +25,16 @@ local function areFriends(a: Player, b: Player): boolean
 end
 
 local function recountFriends()
-	for _, session in Sessions.all() do
+	local sessions = table.clone(Sessions.all()) -- friend checks yield; don't walk the live table
+	for _, session in sessions do
 		local count = 0
-		for _, other in Sessions.all() do
+		for _, other in sessions do
 			if other ~= session and areFriends(session.player, other.player) then
 				count += 1
 			end
+		end
+		if Sessions.get(session.player) ~= session then
+			continue -- left while we were checking
 		end
 		local before = session.factors.friends or 0
 		session.factors.friends = count

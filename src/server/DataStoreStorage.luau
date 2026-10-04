@@ -8,9 +8,10 @@ local RunService = game:GetService("RunService")
 local DataStoreStorage = {}
 DataStoreStorage.__index = DataStoreStorage
 
-local LOAD_ATTEMPTS = 6
+local LOAD_ATTEMPTS = 18
+local LOAD_RETRY_SECONDS = 5 -- 18 x 5s outlasts LOCK_TIMEOUT, so a crashed server's lock always expires in time
 local SAVE_ATTEMPTS = 3
-local LOCK_TIMEOUT = 150 -- seconds; autosave refreshes the lock well within this
+local LOCK_TIMEOUT = 75 -- seconds; autosave (every 60s) refreshes the lock within this
 
 function DataStoreStorage.new(name: string)
 	local ok, store = pcall(DataStoreService.GetDataStore, DataStoreService, name)
@@ -51,7 +52,7 @@ function DataStoreStorage:load(key: string): (boolean, any)
 		if not blocked and RunService:IsStudio() then
 			break -- usually "Studio access to API services" is off; don't make playtests wait
 		end
-		task.wait(attempt * 2)
+		task.wait(LOAD_RETRY_SECONDS)
 	end
 	return false, nil
 end
@@ -64,7 +65,10 @@ function DataStoreStorage:_write(key: string, data: any, keepLock: boolean): boo
 		local stolen = false
 		local ok, err = pcall(function()
 			self.store:UpdateAsync(key, function(record)
-				if lockedByOther(record) then
+				-- Only the server holding the lock may write. A save that lands after we released
+				-- (or after another server took over) must not lock the record again.
+				local lock = record and record.lock
+				if lock == nil or lock.jobId ~= game.JobId then
 					stolen = true
 					return nil
 				end

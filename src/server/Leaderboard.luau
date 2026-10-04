@@ -67,7 +67,7 @@ local function push()
 	if store == nil then
 		return
 	end
-	for _, session in Sessions.all() do
+	for _, session in table.clone(Sessions.all()) do -- SetAsync yields; don't walk the live table
 		local userId, best = session.player.UserId, session.profile.bestStreak
 		if best > 0 and pushed[userId] ~= best then
 			local ok = pcall(store.SetAsync, store, tostring(userId), best)
