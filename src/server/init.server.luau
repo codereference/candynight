@@ -14,6 +14,7 @@ local Strings = require(ReplicatedStorage.Shared.Strings)
 local World = require(script.World)
 local NightDirector = require(script.NightDirector)
 local Weapons = require(script.Weapons)
+local Net = require(ReplicatedStorage.Shared.Net)
 
 local plots = Plots.new(Config.Plots.count)
 local runtimes = {}
@@ -67,6 +68,48 @@ Players.PlayerRemoving:Connect(function(player)
 	Weapons.forget(player)
 	Sessions.stop(player)
 end)
+
+-- Defense requests from clients. Every argument is type-checked; the rules check everything else.
+local function runtimeOf(player: Player)
+	local index = plots:plotOf(player.UserId)
+	return index and runtimes[index]
+end
+
+local function isCell(n: any): boolean
+	return type(n) == "number" and n == n and n % 1 == 0 and math.abs(n) < 1000
+end
+
+Net.func("PlaceDefense").OnServerInvoke = function(player, kind, col, row, rot)
+	local runtime = runtimeOf(player)
+	if not (runtime and type(kind) == "string" and isCell(col) and isCell(row) and isCell(rot)) then
+		return false, "unknown"
+	end
+	return runtime:placeDefense(kind, col, row, rot)
+end
+
+Net.func("MoveDefense").OnServerInvoke = function(player, id, col, row, rot)
+	local runtime = runtimeOf(player)
+	if not (runtime and isCell(id) and isCell(col) and isCell(row) and isCell(rot)) then
+		return false, "unknown"
+	end
+	return runtime:moveDefense(id, col, row, rot)
+end
+
+Net.func("SellDefense").OnServerInvoke = function(player, id)
+	local runtime = runtimeOf(player)
+	if not (runtime and isCell(id)) then
+		return false, "unknown"
+	end
+	return runtime:sellDefense(id)
+end
+
+Net.func("RepairDefense").OnServerInvoke = function(player, id)
+	local runtime = runtimeOf(player)
+	if not (runtime and isCell(id)) then
+		return false, "unknown"
+	end
+	return runtime:repairDefense(id)
+end
 
 World.phaseChanged.Event:Connect(function(phase, night)
 	if phase == "Night" then

@@ -82,6 +82,34 @@ return {
 		GumballBlaster = { damage = 30, cooldown = 0.3, range = 40, ranged = true },
 	},
 
+	-- Grid defenses (see Defenses). requires = button id that unlocks it in the defense shop.
+	Defenses = {
+		maxPlaced = 24,
+		sellShare = 0.5,
+		repairShare = 0.4, -- share of the price to fully repair a destroyed defense
+		catalog = {
+			GumdropTurret = { order = 1, cost = 150, hp = 100, damage = 8, range = 18, fireRate = 1 },
+			PeppermintCannon = {
+				order = 2,
+				cost = 900,
+				hp = 260,
+				damage = 24,
+				range = 22,
+				fireRate = 1.4,
+				requires = "WeaponsPack",
+			},
+			CottonCandyZapper = {
+				order = 3,
+				cost = 3500,
+				hp = 650,
+				damage = 12,
+				range = 16,
+				fireRate = 0.35,
+				requires = "GumballBlaster",
+			},
+		},
+	},
+
 	-- Surviving a night (see NightOutcome).
 	Night = {
 		lossShare = 0.5, -- share of the night's customers you may lose on a 0 streak

@@ -3,6 +3,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(ReplicatedStorage.Shared.Config)
+local Defenses = require(ReplicatedStorage.Shared.Rules.Defenses)
+local Grid = require(ReplicatedStorage.Shared.Rules.Grid)
+local Layout = require(ReplicatedStorage.Shared.Layout)
 local Format = require(ReplicatedStorage.Shared.Format)
 local Net = require(ReplicatedStorage.Shared.Net)
 local NightOutcome = require(ReplicatedStorage.Shared.Rules.NightOutcome)
@@ -12,6 +15,7 @@ local UnlockTree = require(ReplicatedStorage.Shared.Rules.UnlockTree)
 local WeaponRules = require(ReplicatedStorage.Shared.Rules.WeaponRules)
 local ButtonsView = require(script.Parent.ButtonsView)
 local CustomerView = require(script.Parent.CustomerView)
+local DefenseView = require(script.Parent.DefenseView)
 local ItemsView = require(script.Parent.ItemsView)
 local PlotView = require(script.Parent.PlotView)
 local Weapons = require(script.Parent.Weapons)
@@ -20,6 +24,8 @@ local PlotRuntime = {}
 PlotRuntime.__index = PlotRuntime
 
 PlotRuntime.tree = UnlockTree.new(Config.Buttons)
+PlotRuntime.grid = Grid.new(Layout)
+local DEFENSES = Config.Defenses.catalog
 PlotRuntime.nightEnded = Instance.new("BindableEvent") -- fires (runtime, result) after each shop's dawn
 
 local nightResultRemote = Net.event("NightResult")
@@ -34,6 +40,7 @@ function PlotRuntime.new(index: number, origin: CFrame)
 		session = nil,
 		shop = nil,
 		outcome = nil, -- NightOutcome while it's night
+		defenseModels = {}, -- [placed id] = Model
 		connections = {},
 	}, PlotRuntime)
 	self.buttons = ButtonsView.new(view, function(player, id)
@@ -55,12 +62,16 @@ function PlotRuntime:assign(player: Player, session)
 	self.session = session
 	self.shop = Shop.new(Config.Shop)
 	self.view.setOwnerName(player.DisplayName)
+	player:SetAttribute("PlotIndex", self.index)
 
 	for _, id in self.tree:ownedInOrder(session.profile.owned) do
 		ItemsView.build(self.view, id, false)
 	end
 	self:_applyEffects()
 	self:_showButtons()
+	for _, entry in session.profile.placed do
+		self:_buildDefense(entry)
+	end
 	self:_publishNight()
 	self:giveWeapons()
 	table.insert(
@@ -73,6 +84,9 @@ function PlotRuntime:assign(player: Player, session)
 end
 
 function PlotRuntime:release()
+	if self.owner then
+		self.owner:SetAttribute("PlotIndex", nil)
+	end
 	for _, connection in self.connections do
 		connection:Disconnect()
 	end
@@ -81,6 +95,7 @@ function PlotRuntime:release()
 	self.session = nil
 	self.shop = nil
 	self.outcome = nil
+	table.clear(self.defenseModels)
 	self.customers:clear()
 	self.buttons:clear()
 	self.view.clear()
@@ -248,13 +263,84 @@ function PlotRuntime:endNight()
 	PlotRuntime.nightEnded:Fire(self, result)
 end
 
--- Placeholder until defenses exist (#11/#12): marks a placed defense as destroyed.
-function PlotRuntime:breakDefense(id: number)
-	for _, placed in self.session.profile.placed do
-		if placed.id == id then
-			placed.hp = 0
-		end
+-- Defenses -------------------------------------------------------------------------------------
+
+function PlotRuntime:_buildDefense(entry)
+	local model = DefenseView.build(self.view, entry)
+	DefenseView.setHealth(model, entry.hp / DEFENSES[entry.kind].hp)
+	self.defenseModels[entry.id] = model
+end
+
+-- Each returns true, or false plus a reason key the client shows (see Strings "Reason.*").
+function PlotRuntime:placeDefense(kind: string, col: number, row: number, rot: number): (boolean, string?)
+	local session = self.session
+	local entry, reason = Defenses.place(
+		session.profile,
+		session.wallet,
+		self.grid,
+		DEFENSES,
+		Config.Defenses,
+		session.profile.owned,
+		kind,
+		col,
+		row,
+		rot
+	)
+	session:syncCash()
+	if entry == nil then
+		return false, reason
 	end
+	self:_buildDefense(entry)
+	session:notify("Defense.Placed", { item = Strings.get("Defense." .. kind) })
+	return true, nil
+end
+
+function PlotRuntime:moveDefense(id: number, col: number, row: number, rot: number): (boolean, string?)
+	local ok, reason = Defenses.move(self.session.profile, self.grid, id, col, row, rot)
+	if ok then
+		DefenseView.place(self.view, self.defenseModels[id], (Defenses.find(self.session.profile, id)))
+	end
+	return ok, reason
+end
+
+function PlotRuntime:sellDefense(id: number): (boolean, string?)
+	local session = self.session
+	local refund = Defenses.sell(session.profile, session.wallet, DEFENSES, Config.Defenses, id)
+	session:syncCash()
+	if refund == nil then
+		return false, "missing"
+	end
+	self.defenseModels[id]:Destroy()
+	self.defenseModels[id] = nil
+	session:notify("Defense.Sold", { cash = Format.cash(refund) })
+	return true, nil
+end
+
+function PlotRuntime:repairDefense(id: number): (boolean, string?)
+	local session = self.session
+	local ok, reason = Defenses.repair(session.profile, session.wallet, DEFENSES, Config.Defenses, id)
+	session:syncCash()
+	if not ok then
+		return false, if reason == "full" then "full_hp" else reason
+	end
+	DefenseView.setHealth(self.defenseModels[id], 1)
+	session:notify("Defense.Repaired")
+	return true, nil
+end
+
+-- Damages a placed defense (creatures, failed nights). Returns true when it was destroyed.
+function PlotRuntime:damageDefense(id: number, amount: number): boolean
+	local profile = self.session.profile
+	local destroyed = Defenses.damage(profile, id, amount)
+	local entry = Defenses.find(profile, id)
+	if entry then
+		DefenseView.setHealth(self.defenseModels[id], entry.hp / DEFENSES[entry.kind].hp)
+	end
+	return destroyed
+end
+
+function PlotRuntime:breakDefense(id: number)
+	self:damageDefense(id, math.huge)
 end
 
 return PlotRuntime

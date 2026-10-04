@@ -138,6 +138,7 @@ function PlotView.build(index: number, origin: CFrame, queueSpacing: number)
 	end
 
 	view.setOwnerName(nil)
+	model:SetAttribute("Origin", origin) -- the client places defenses relative to this
 	model.Parent = workspace
 	return view
 end
