@@ -1,0 +1,16 @@
+-- Every tunable number lives here so balancing never means hunting through code.
+
+return {
+	startingCash = 0,
+
+	Shop = {
+		baseSale = 5, -- cash per serve before any goods bonuses
+		customerInterval = 6, -- seconds between customer arrivals
+		maxQueue = 5,
+	},
+
+	Customer = {
+		walkSpeed = 10, -- studs per second
+		queueSpacing = 4, -- studs between customers in line
+	},
+}

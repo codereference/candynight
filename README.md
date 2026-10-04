@@ -32,13 +32,36 @@ Pre-production. The full design is in the spec, [#1](https://github.com/coderefe
 
 ## Development
 
-The code isn't scaffolded yet. Once it is, the workflow will be:
+Tools (Rojo, Lune, StyLua, luau-lsp) are pinned in `rokit.toml`. Install them with:
+
+```bash
+rokit install
+```
+
+**Play in Studio:** start the sync server, open a new Baseplate place in Roblox Studio, click **Connect** in the Rojo plugin, then press Play.
 
 ```bash
 rojo serve
 ```
 
-With that running, connect from the Rojo plugin in Roblox Studio.
+**Run the tests** (headless, no Studio needed):
+
+```bash
+lune run tests/run
+```
+
+**Format:**
+
+```bash
+stylua src tests
+```
+
+### Layout
+
+- `src/shared/Rules/`: pure game rules (no Roblox APIs), covered by `tests/*.spec.luau`
+- `src/shared/Config.luau`: every tunable number
+- `src/server/`: thin server adapters that build the world and feed input and time into the rules
+- `src/client/`: UI that only displays server-owned state
 
 ## Agent skills
 

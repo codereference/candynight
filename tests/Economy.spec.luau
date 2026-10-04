@@ -1,0 +1,41 @@
+local t = require("./lib/t")
+local Economy = require("../src/shared/Rules/Economy")
+
+t.test("starts with the given cash, or zero", function()
+	t.expect(Economy.new(25):getCash()).toBe(25)
+	t.expect(Economy.new():getCash()).toBe(0)
+end)
+
+t.test("earning adds whole cash and reports what was added", function()
+	local wallet = Economy.new(0)
+	t.expect(wallet:earn(7.9)).toBe(7)
+	t.expect(wallet:getCash()).toBe(7)
+end)
+
+t.test("earning a negative amount adds nothing", function()
+	local wallet = Economy.new(10)
+	t.expect(wallet:earn(-5)).toBe(0)
+	t.expect(wallet:getCash()).toBe(10)
+end)
+
+t.test("spending within budget deducts cash", function()
+	local wallet = Economy.new(20)
+	t.expect(wallet:spend(15)).toBe(true)
+	t.expect(wallet:getCash()).toBe(5)
+end)
+
+t.test("spending exactly everything is allowed", function()
+	local wallet = Economy.new(20)
+	t.expect(wallet:spend(20)).toBe(true)
+	t.expect(wallet:getCash()).toBe(0)
+end)
+
+t.test("spending more than you have fails and changes nothing", function()
+	local wallet = Economy.new(10)
+	t.expect(wallet:spend(11)).toBe(false)
+	t.expect(wallet:getCash()).toBe(10)
+end)
+
+t.test("can't afford a negative cost", function()
+	t.expect(Economy.new(10):canAfford(-1)).toBe(false)
+end)
