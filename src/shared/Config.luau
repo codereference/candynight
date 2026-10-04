@@ -122,6 +122,13 @@ return {
 		pvpDamageScale = 1, -- defender weapon damage multiplier against invaders
 	},
 
+	-- What staff earn while you're away (see Offline).
+	Offline = {
+		capSeconds = 8 * 3600,
+		minSeconds = 60,
+		efficiency = 0.5,
+	},
+
 	Rebirth = {
 		baseCost = 50000,
 		costGrowth = 2.5,

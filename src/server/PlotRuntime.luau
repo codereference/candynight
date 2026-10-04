@@ -9,6 +9,7 @@ local Layout = require(ReplicatedStorage.Shared.Layout)
 local Format = require(ReplicatedStorage.Shared.Format)
 local Net = require(ReplicatedStorage.Shared.Net)
 local NightOutcome = require(ReplicatedStorage.Shared.Rules.NightOutcome)
+local Offline = require(ReplicatedStorage.Shared.Rules.Offline)
 local Rebirth = require(ReplicatedStorage.Shared.Rules.Rebirth)
 local Shop = require(ReplicatedStorage.Shared.Rules.Shop)
 local Strings = require(ReplicatedStorage.Shared.Strings)
@@ -31,6 +32,7 @@ PlotRuntime.nightEnded = Instance.new("BindableEvent") -- fires (runtime, result
 PlotRuntime.reborn = Instance.new("BindableEvent") -- fires (runtime) after a rebirth
 
 local nightResultRemote = Net.event("NightResult")
+local offlineRemote = Net.event("OfflineEarnings")
 
 function PlotRuntime.new(index: number, origin: CFrame)
 	local view = PlotView.build(index, origin, Config.Customer.queueSpacing)
@@ -69,6 +71,7 @@ function PlotRuntime:assign(player: Player, session)
 	self:_buildShop()
 	self:_publishNight()
 	self:giveWeapons()
+	self:_offerOfflineEarnings()
 	table.insert(
 		self.connections,
 		session.cashChanged.Event:Connect(function(cash)
@@ -88,6 +91,22 @@ function PlotRuntime:_buildShop()
 	self:_showButtons()
 	for _, entry in profile.placed do
 		self:_buildDefense(entry)
+	end
+end
+
+-- Works out what staff earned while the owner was away and offers it in a welcome-back popup.
+function PlotRuntime:_offerOfflineEarnings()
+	local session = self.session
+	local lastOnline = session.profile.lastOnline
+	if lastOnline <= 0 then
+		return -- brand-new player
+	end
+	local away = os.time() - lastOnline
+	local staff = self.tree:effects(session.profile.owned).staff
+	local amount = Offline.earnings(Config.Offline, away, staff, self.shop:saleValue(), session:multiplier())
+	if amount > 0 then
+		session.pendingOffline = amount
+		offlineRemote:FireClient(self.owner, amount, math.min(away, Config.Offline.capSeconds))
 	end
 end
 

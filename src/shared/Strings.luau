@@ -71,6 +71,10 @@ local EN: { [string]: string } = {
 	["Rebirth.Done"] = "✨ Reborn! Income is now x{mult}",
 	["Ui.Cancel"] = "Cancel",
 
+	["Offline.Title"] = "Welcome back! 👋",
+	["Offline.Body"] = "Your staff kept the shop open for {time} and earned {cash}!",
+	["Offline.Collect"] = "Collect",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 

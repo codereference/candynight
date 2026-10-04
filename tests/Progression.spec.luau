@@ -60,3 +60,25 @@ end)
 t.test("the friend bonus is capped", function()
 	t.expect(Income.multiplier(INCOME, { friends = 10 })).toBe(1.3)
 end)
+
+local Offline = require("../src/shared/Rules/Offline")
+local OFFLINE = { capSeconds = 8 * 3600, minSeconds = 60, efficiency = 0.5 }
+
+t.test("staff earn at half speed while you're away", function()
+	-- one worker serving every 4s at $10 for 400s = 100 sales, half rate = $500
+	t.expect(Offline.earnings(OFFLINE, 400, { { interval = 4 } }, 10, 1)).toBe(500)
+end)
+
+t.test("offline earnings are capped", function()
+	local capped = Offline.earnings(OFFLINE, 100 * 3600, { { interval = 4 } }, 10, 1)
+	t.expect(capped).toBe(Offline.earnings(OFFLINE, 8 * 3600, { { interval = 4 } }, 10, 1))
+end)
+
+t.test("no staff or a quick rejoin earns nothing", function()
+	t.expect(Offline.earnings(OFFLINE, 5000, {}, 10, 1)).toBe(0)
+	t.expect(Offline.earnings(OFFLINE, 30, { { interval = 4 } }, 10, 1)).toBe(0)
+end)
+
+t.test("boosts apply to offline earnings too", function()
+	t.expect(Offline.earnings(OFFLINE, 400, { { interval = 4 } }, 10, 2)).toBe(1000)
+end)

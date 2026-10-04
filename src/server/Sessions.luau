@@ -69,11 +69,22 @@ function Sessions.stop(player: Player)
 	if session then
 		active[player] = nil
 		closing += 1
+		session:collectOffline()
 		session:_writeBack()
 		session.cashChanged:Destroy()
 		session.save:close()
 		closing -= 1
 	end
+end
+
+-- Pays out offline earnings the player was offered (on Collect, or automatically when leaving).
+function Session:collectOffline(): number
+	local amount = self.pendingOffline or 0
+	self.pendingOffline = nil
+	if amount > 0 then
+		self:earn(amount)
+	end
+	return amount
 end
 
 function Session:_writeBack()

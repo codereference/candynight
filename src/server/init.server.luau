@@ -107,6 +107,11 @@ Net.func("Rebirth").OnServerInvoke = function(player)
 	return runtime:rebirth()
 end
 
+Net.func("CollectOffline").OnServerInvoke = function(player)
+	local session = Sessions.get(player)
+	return session and session:collectOffline() or 0
+end
+
 Net.func("SellDefense").OnServerInvoke = function(player, id)
 	local runtime = runtimeOf(player)
 	if not (runtime and isCell(id)) then
