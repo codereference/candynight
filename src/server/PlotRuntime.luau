@@ -31,6 +31,7 @@ PlotRuntime.grid = Grid.new(Layout)
 local DEFENSES = Config.Defenses.catalog
 PlotRuntime.nightEnded = Instance.new("BindableEvent") -- fires (runtime, result) after each shop's dawn
 PlotRuntime.reborn = Instance.new("BindableEvent") -- fires (runtime) after a rebirth
+PlotRuntime.weaponsGiven = Instance.new("BindableEvent") -- fires (player) after weapons are handed out
 
 local nightResultRemote = Net.event("NightResult")
 local offlineRemote = Net.event("OfflineEarnings")
@@ -183,6 +184,7 @@ function PlotRuntime:giveWeapons()
 	local profile = self.session.profile
 	local unlocked = self.tree:effects(profile.owned).weapons
 	Weapons.equip(self.owner, WeaponRules.owned(profile.weapons, unlocked))
+	PlotRuntime.weaponsGiven:Fire(self.owner)
 end
 
 function PlotRuntime:_applyEffects()

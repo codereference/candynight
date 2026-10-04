@@ -23,6 +23,7 @@ local Bonuses = require(script.Bonuses)
 local Events = require(ReplicatedStorage.Shared.Rules.Events)
 local Monetization = require(script.Monetization)
 local Products = require(script.Products)
+local Style = require(script.Style)
 local Net = require(ReplicatedStorage.Shared.Net)
 
 local plots = Plots.new(Config.Plots.count)
@@ -60,6 +61,7 @@ Rewards.start()
 Bonuses.start()
 Monetization.start()
 Products.start(runtimeOf)
+Style.start(runtimeOf, PlotRuntime.weaponsGiven, Monetization.perksChanged)
 
 local function onPlayerAdded(player: Player)
 	local session = Sessions.start(player) -- yields while the save loads

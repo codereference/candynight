@@ -38,7 +38,7 @@ function PlotView.build(index: number, origin: CFrame, queueSpacing: number)
 		return origin * CFrame.new(x, y, z)
 	end
 
-	part(model, {
+	local floor = part(model, {
 		Name = "Floor",
 		Size = Vector3.new(Layout.PLOT_SIZE, 1, Layout.PLOT_SIZE),
 		CFrame = at(0, -0.4, 0), -- mostly sunk so the road and floor are level
@@ -107,6 +107,7 @@ function PlotView.build(index: number, origin: CFrame, queueSpacing: number)
 		model = model,
 		origin = origin,
 		counter = counter,
+		floor = floor,
 		register = register,
 		spawn = spawn,
 		servePrompt = prompt,
@@ -129,12 +130,20 @@ function PlotView.build(index: number, origin: CFrame, queueSpacing: number)
 		signText.Text = if name then Strings.get("Plot.Owned", { name = name }) else Strings.get("Plot.Free")
 	end
 
+	-- Shop theme cosmetic: recolours the floor and counter. nil = the default look.
+	local defaultFloor, defaultCounter = floor.Color, counter.Color
+	function view.setTheme(theme)
+		floor.Color = if theme then theme.floor else defaultFloor
+		counter.Color = if theme then theme.counter else defaultCounter
+	end
+
 	-- Removes everything an owner built, leaving the empty plot.
 	function view.clear()
 		for _, f in { view.items, view.buttons, view.customers, view.defenses } do
 			f:ClearAllChildren()
 		end
 		prompt.Enabled = false
+		view.setTheme(nil)
 	end
 
 	view.setOwnerName(nil)

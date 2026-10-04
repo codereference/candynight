@@ -72,3 +72,49 @@ t.test("old receipts are pruned, newest kept", function()
 	Receipts.prune(receipts, 2)
 	t.expect(receipts).toEqual({ b = 3, c = 2 })
 end)
+
+local Cosmetics = require("../src/shared/Rules/Cosmetics")
+local Economy = require("../src/shared/Rules/Economy")
+local COSMETICS = {
+	Classic = { slot = "theme", default = true },
+	Mint = { slot = "theme", cost = 100 },
+	Midnight = { slot = "theme", perk = "vip" },
+	Sparkle = { slot = "trail", cost = 50 },
+}
+local function cosmetics()
+	return { owned = {}, equipped = {} }
+end
+
+t.test("default cosmetics are free and worn until something else is equipped", function()
+	local state = cosmetics()
+	t.expect(Cosmetics.isOwned(COSMETICS, state, {}, "Classic")).toBe(true)
+	t.expect(Cosmetics.worn(COSMETICS, state, {}, "theme")).toBe("Classic")
+	t.expect(Cosmetics.worn(COSMETICS, state, {}, "trail")).toBe(nil)
+end)
+
+t.test("cash cosmetics are bought once, then equipped", function()
+	local state, wallet = cosmetics(), Economy.new(150)
+	t.expect(Cosmetics.buy(COSMETICS, state, {}, wallet, "Mint")).toBe(true)
+	t.expect(wallet:getCash()).toBe(50)
+	t.expect(select(2, Cosmetics.buy(COSMETICS, state, {}, wallet, "Mint"))).toBe("owned")
+	t.expect(Cosmetics.equip(COSMETICS, state, {}, "Mint")).toBe(true)
+	t.expect(Cosmetics.worn(COSMETICS, state, {}, "theme")).toBe("Mint")
+end)
+
+t.test("can't equip what you don't own, or buy what you can't afford", function()
+	local state = cosmetics()
+	t.expect(select(2, Cosmetics.equip(COSMETICS, state, {}, "Mint"))).toBe("notOwned")
+	t.expect(select(2, Cosmetics.buy(COSMETICS, state, {}, Economy.new(10), "Mint"))).toBe("cash")
+end)
+
+t.test("pass cosmetics come with the pass and can't be bought with cash", function()
+	local state = cosmetics()
+	t.expect(select(2, Cosmetics.buy(COSMETICS, state, {}, Economy.new(1e9), "Midnight"))).toBe("perk")
+	t.expect(Cosmetics.equip(COSMETICS, state, { vip = true }, "Midnight")).toBe(true)
+end)
+
+t.test("if a pass lapses, its cosmetic falls back to the default", function()
+	local state = cosmetics()
+	Cosmetics.equip(COSMETICS, state, { vip = true }, "Midnight")
+	t.expect(Cosmetics.worn(COSMETICS, state, {}, "theme")).toBe("Classic")
+end)

@@ -134,6 +134,76 @@ return {
 		rewards = { 100, 250, 500, 1000, 2000, 3500, 6000 }, -- day 1..7; day 7 repeats after
 	},
 
+	-- Cosmetics (see Cosmetics): purely visual. default = free, cost = cash, perk = comes with a pass.
+	Cosmetics = {
+		-- Shop themes
+		Classic = {
+			slot = "theme",
+			order = 1,
+			default = true,
+			floor = Color3.fromRGB(255, 214, 224),
+			counter = Color3.fromRGB(176, 112, 76),
+		},
+		Mint = {
+			slot = "theme",
+			order = 2,
+			cost = 2000,
+			floor = Color3.fromRGB(190, 240, 215),
+			counter = Color3.fromRGB(120, 190, 160),
+		},
+		Lavender = {
+			slot = "theme",
+			order = 3,
+			cost = 6000,
+			floor = Color3.fromRGB(225, 210, 255),
+			counter = Color3.fromRGB(150, 120, 200),
+		},
+		Midnight = {
+			slot = "theme",
+			order = 4,
+			perk = "vip",
+			floor = Color3.fromRGB(70, 60, 110),
+			counter = Color3.fromRGB(40, 30, 70),
+		},
+		Rainbow = {
+			slot = "theme",
+			order = 5,
+			perk = "sweetStyle",
+			floor = Color3.fromRGB(255, 235, 150),
+			counter = Color3.fromRGB(255, 120, 160),
+		},
+		-- Weapon skins
+		PlainSkin = { slot = "skin", order = 6, default = true },
+		Bubblegum = { slot = "skin", order = 7, cost = 3000, color = Color3.fromRGB(255, 140, 200) },
+		GoldSkin = { slot = "skin", order = 8, perk = "sweetStyle", color = Color3.fromRGB(255, 205, 60), neon = true },
+		-- Trails
+		NoTrail = { slot = "trail", order = 9, default = true },
+		Sparkle = {
+			slot = "trail",
+			order = 10,
+			cost = 2500,
+			colors = { Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 240, 150) },
+		},
+		Hearts = {
+			slot = "trail",
+			order = 11,
+			perk = "vip",
+			colors = { Color3.fromRGB(255, 120, 160), Color3.fromRGB(255, 200, 220) },
+		},
+		RainbowTrail = {
+			slot = "trail",
+			order = 12,
+			perk = "sweetStyle",
+			colors = {
+				Color3.fromRGB(255, 90, 90),
+				Color3.fromRGB(255, 220, 90),
+				Color3.fromRGB(90, 220, 140),
+				Color3.fromRGB(90, 160, 255),
+				Color3.fromRGB(190, 110, 255),
+			},
+		},
+	},
+
 	-- Limited-time events (see Events). First match wins. Dates are unix seconds (UTC).
 	Events = {
 		{
