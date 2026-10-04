@@ -9,6 +9,7 @@ local Config = require(ReplicatedStorage.Shared.Config)
 local Plots = require(ReplicatedStorage.Shared.Rules.Plots)
 local PlotRuntime = require(script.PlotRuntime)
 local PlotView = require(script.PlotView)
+local Scenery = require(script.Scenery)
 local Sessions = require(script.Sessions)
 local Strings = require(ReplicatedStorage.Shared.Strings)
 local World = require(script.World)
@@ -30,6 +31,8 @@ local Net = require(ReplicatedStorage.Shared.Net)
 
 local plots = Plots.new(Config.Plots.count)
 local runtimes = {}
+
+Scenery.build(Config.Plots.spacing, Config.Plots.rowOffset)
 
 -- Two rows of plots facing each other across the road.
 PlotView.buildRoad(Config.Plots.spacing * 4)
