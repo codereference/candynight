@@ -9,9 +9,9 @@ Kid-friendly (Roblox **Mild** maturity), and built for mobile and PC.
 
 ## Status
 
-Pre-production. The full design is in the spec, [#1](https://github.com/codereference/candynight/issues/1). Work is tracked in [GitHub Issues](https://github.com/codereference/candynight/issues).
+Feature-complete and ready for playtesting. The design is in the spec, [#1](https://github.com/codereference/candynight/issues/1). The steps that need the owner's Roblox account (ids, uploads, publishing) are in [docs/launch-checklist.md](docs/launch-checklist.md).
 
-## Features (planned)
+## Features
 
 - 6 players per server, each with their own shop plot
 - Customers to serve, staff to hire, a tree of buy buttons to unlock, and expansion packs
