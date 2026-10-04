@@ -5,18 +5,29 @@
 local Shop = {}
 Shop.__index = Shop
 
--- config: { baseSale: number, customerInterval: number, maxQueue: number }
+-- config: { baseSale, customerInterval, minCustomerInterval, maxQueue }
 function Shop.new(config)
 	return setmetatable({
 		config = config,
+		effects = { goods = 0, decor = 0 },
 		queue = {},
 		nextCustomerId = 1,
 		untilArrival = 0, -- the first customer shows up on the first tick
 	}, Shop)
 end
 
+-- effects: { goods = extra cash per sale, decor = seconds off the arrival interval } (see UnlockTree:effects)
+function Shop:setEffects(effects)
+	self.effects = effects
+end
+
 function Shop:saleValue(): number
-	return self.config.baseSale
+	return self.config.baseSale + self.effects.goods
+end
+
+-- Seconds between customer arrivals. Décor speeds it up, down to a floor.
+function Shop:arrivalInterval(): number
+	return math.max(self.config.minCustomerInterval, self.config.customerInterval - self.effects.decor)
 end
 
 -- Customer ids in line order, front first. A copy, so callers can't change the queue.
@@ -37,7 +48,7 @@ function Shop:tick(dt: number)
 		self.nextCustomerId += 1
 		table.insert(self.queue, id)
 		table.insert(events, { kind = "CustomerArrived", customerId = id })
-		self.untilArrival += self.config.customerInterval
+		self.untilArrival += self:arrivalInterval()
 	end
 	return events
 end

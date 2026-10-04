@@ -10,6 +10,7 @@ local Plots = require(ReplicatedStorage.Shared.Rules.Plots)
 local PlotRuntime = require(script.PlotRuntime)
 local PlotView = require(script.PlotView)
 local Sessions = require(script.Sessions)
+local Strings = require(ReplicatedStorage.Shared.Strings)
 
 local plots = Plots.new(Config.Plots.count)
 local runtimes = {}
@@ -34,7 +35,7 @@ local function onPlayerAdded(player: Player)
 	end
 	local index = plots:claim(player.UserId)
 	if index == nil then
-		player:Kick("This server is full. Please try another one!")
+		player:Kick(Strings.get("Kick.Full"))
 		return
 	end
 	local runtime = runtimes[index]

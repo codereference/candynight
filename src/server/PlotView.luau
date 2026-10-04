@@ -4,6 +4,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Layout = require(ReplicatedStorage.Shared.Layout)
+local Strings = require(ReplicatedStorage.Shared.Strings)
 
 local PlotView = {}
 
@@ -94,8 +95,8 @@ function PlotView.build(index: number, origin: CFrame, queueSpacing: number)
 	spawn.Parent = model
 
 	local prompt = Instance.new("ProximityPrompt")
-	prompt.ActionText = "Serve"
-	prompt.ObjectText = "Counter"
+	prompt.ActionText = Strings.get("Prompt.Serve")
+	prompt.ObjectText = Strings.get("Prompt.Counter")
 	prompt.HoldDuration = 0
 	prompt.MaxActivationDistance = 12
 	prompt.RequiresLineOfSight = false
@@ -125,7 +126,7 @@ function PlotView.build(index: number, origin: CFrame, queueSpacing: number)
 	end
 
 	function view.setOwnerName(name: string?)
-		signText.Text = if name then name .. "'s Sweet Shop" else "Free Shop"
+		signText.Text = if name then Strings.get("Plot.Owned", { name = name }) else Strings.get("Plot.Free")
 	end
 
 	-- Removes everything an owner built, leaving the empty plot.

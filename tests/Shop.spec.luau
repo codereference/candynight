@@ -1,7 +1,7 @@
 local t = require("./lib/t")
 local Shop = require("../src/shared/Rules/Shop")
 
-local CONFIG = { baseSale = 5, customerInterval = 6, maxQueue = 3 }
+local CONFIG = { baseSale = 5, customerInterval = 6, minCustomerInterval = 2, maxQueue = 3 }
 
 local function arrivals(events)
 	local ids = {}
@@ -62,4 +62,24 @@ t.test("changing the returned queue doesn't change the shop", function()
 	shop:tick(0.1)
 	table.clear(shop:getQueue())
 	t.expect(shop:getQueue()).toEqual({ 1 })
+end)
+
+t.test("goods raise the cash paid per sale", function()
+	local shop = Shop.new(CONFIG)
+	shop:setEffects({ goods = 8, decor = 0 })
+	shop:tick(0.1)
+	t.expect(shop:serve().cash).toBe(13)
+end)
+
+t.test("decor brings customers more often", function()
+	local shop = Shop.new(CONFIG)
+	shop:setEffects({ goods = 0, decor = 2 })
+	shop:tick(0.1)
+	t.expect(arrivals(shop:tick(4))).toEqual({ 2 })
+end)
+
+t.test("decor can't push arrivals faster than the minimum interval", function()
+	local shop = Shop.new(CONFIG)
+	shop:setEffects({ goods = 0, decor = 100 })
+	t.expect(shop:arrivalInterval()).toBe(2)
 end)

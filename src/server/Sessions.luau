@@ -8,6 +8,7 @@ local Config = require(ReplicatedStorage.Shared.Config)
 local Economy = require(ReplicatedStorage.Shared.Rules.Economy)
 local SaveSession = require(ReplicatedStorage.Shared.Persistence.SaveSession)
 local DataStoreStorage = require(script.Parent.DataStoreStorage)
+local Net = require(ReplicatedStorage.Shared.Net)
 
 local Sessions = {}
 
@@ -15,6 +16,7 @@ local Session = {}
 Session.__index = Session
 
 local storage = DataStoreStorage.new(Config.Save.dataStoreName)
+local notifyRemote = Net.event("Notify")
 local active: { [Player]: any } = {}
 local closing = 0 -- final saves still in flight; shutdown waits for these
 
@@ -42,6 +44,7 @@ function Sessions.start(player: Player)
 		profile = save.profile,
 		wallet = Economy.new(save.profile.cash),
 		cashValue = cash,
+		cashChanged = Instance.new("BindableEvent"), -- fires (cash) whenever cash changes
 	}, Session)
 	session:syncCash()
 	active[player] = session
@@ -63,6 +66,7 @@ function Sessions.stop(player: Player)
 		active[player] = nil
 		closing += 1
 		session:_writeBack()
+		session.cashChanged:Destroy()
 		session.save:close()
 		closing -= 1
 	end
@@ -79,7 +83,16 @@ function Session:saveNow(): boolean
 end
 
 function Session:syncCash()
-	self.cashValue.Value = self.wallet:getCash()
+	local cash = self.wallet:getCash()
+	if self.cashValue.Value ~= cash then
+		self.cashValue.Value = cash
+		self.cashChanged:Fire(cash)
+	end
+end
+
+-- Sends the player a localized toast message (see Strings for keys).
+function Session:notify(key: string, vars: { [string]: any }?)
+	notifyRemote:FireClient(self.player, key, vars)
 end
 
 function Session:earn(amount: number): number

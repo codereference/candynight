@@ -1,85 +1,15 @@
--- Shows customers in the world: a cute placeholder NPC per customer id that walks between spots.
+-- Shows customers in the world: an NPC per customer id that walks between spots.
 -- Movement is tweened on anchored parts. That's cheap on phones, and creatures can reuse it later.
 
 local TweenService = game:GetService("TweenService")
 
+local NpcModel = require(script.Parent.NpcModel)
+
 local CustomerView = {}
 CustomerView.__index = CustomerView
 
-local BODY_HEIGHT = 2.6
-local PASTELS = {
-	Color3.fromRGB(255, 179, 186),
-	Color3.fromRGB(255, 223, 186),
-	Color3.fromRGB(186, 255, 201),
-	Color3.fromRGB(186, 225, 255),
-	Color3.fromRGB(221, 190, 255),
-}
-
-local function makeModel(id: number): Model
-	local model = Instance.new("Model")
-	model.Name = "Customer" .. id
-
-	local function part(props: { [string]: any }): Part
-		local p = Instance.new("Part")
-		p.Anchored = true
-		p.CanCollide = false
-		p.CanQuery = false
-		p.CastShadow = true
-		p.Material = Enum.Material.SmoothPlastic
-		for key, value in props do
-			(p :: any)[key] = value
-		end
-		p.Parent = model
-		return p
-	end
-
-	-- Built around a body origin at ground level, facing -Z.
-	local body = part({
-		Name = "Body",
-		Size = Vector3.new(2, BODY_HEIGHT, 1.4),
-		CFrame = CFrame.new(0, BODY_HEIGHT / 2, 0),
-		Color = PASTELS[(id - 1) % #PASTELS + 1],
-	})
-	part({
-		Name = "Head",
-		Shape = Enum.PartType.Ball,
-		Size = Vector3.new(2, 2, 2),
-		CFrame = CFrame.new(0, BODY_HEIGHT + 0.9, 0),
-		Color = Color3.fromRGB(255, 220, 190),
-	})
-	for _, x in { -0.4, 0.4 } do
-		part({
-			Name = "Eye",
-			Shape = Enum.PartType.Ball,
-			Size = Vector3.new(0.35, 0.35, 0.35),
-			CFrame = CFrame.new(x, BODY_HEIGHT + 1.05, -0.9),
-			Color = Color3.fromRGB(40, 30, 40),
-		})
-	end
-	model.PrimaryPart = body
-
-	local bubble = Instance.new("BillboardGui")
-	bubble.Size = UDim2.fromOffset(40, 40)
-	bubble.StudsOffsetWorldSpace = Vector3.new(0, BODY_HEIGHT + 3, 0)
-	bubble.Adornee = body
-	bubble.Parent = body
-	local wish = Instance.new("TextLabel")
-	wish.BackgroundTransparency = 1
-	wish.Size = UDim2.fromScale(1, 1)
-	wish.Text = "🧁"
-	wish.TextScaled = true
-	wish.Parent = bubble
-
-	return model
-end
-
 function CustomerView.new(walkSpeed: number, parent: Instance)
 	return setmetatable({ walkSpeed = walkSpeed, parent = parent, customers = {} }, CustomerView)
-end
-
--- Ground-level pivot: the body part's pivot sits half a body above the ground.
-local function pivotFor(ground: CFrame): CFrame
-	return ground * CFrame.new(0, BODY_HEIGHT / 2, 0)
 end
 
 function CustomerView:_walk(id: number, ground: CFrame, onArrived: (() -> ())?)
@@ -91,7 +21,7 @@ function CustomerView:_walk(id: number, ground: CFrame, onArrived: (() -> ())?)
 		customer.tween:Cancel()
 	end
 	local from = customer.driver.Value
-	local to = pivotFor(ground)
+	local to = NpcModel.pivotFor(ground)
 	local distance = (to.Position - from.Position).Magnitude
 	-- Face the way we're walking, then turn to the target facing on arrival.
 	if distance > 0.05 then
@@ -112,15 +42,22 @@ function CustomerView:_walk(id: number, ground: CFrame, onArrived: (() -> ())?)
 end
 
 function CustomerView:spawn(id: number, at: CFrame)
-	local model = makeModel(id)
+	local pastels = NpcModel.PASTELS
+	local model = NpcModel.make("Customer" .. id, { color = pastels[(id - 1) % #pastels + 1], bubble = "🧁" })
 	local driver = Instance.new("CFrameValue")
-	driver.Value = pivotFor(at)
+	driver.Value = NpcModel.pivotFor(at)
 	driver.Changed:Connect(function(value)
 		model:PivotTo(value)
 	end)
 	model:PivotTo(driver.Value)
 	model.Parent = self.parent
 	self.customers[id] = { model = model, driver = driver }
+end
+
+-- Current world position of a customer, or nil if they're gone.
+function CustomerView:positionOf(id: number): Vector3?
+	local customer = self.customers[id]
+	return customer and customer.driver.Value.Position
 end
 
 -- Walks every customer still in line to their spot. queue: ids front-first.
@@ -130,32 +67,34 @@ function CustomerView:layout(queue: { number }, slotFor: (number) -> CFrame)
 	end
 end
 
--- Walks a served customer off to `exit`, then removes them.
-function CustomerView:leave(id: number, exit: CFrame)
+-- Walks a customer off to `exit` showing `bubble`, then removes them.
+function CustomerView:leave(id: number, exit: CFrame, bubble: string?)
 	local customer = self.customers[id]
 	if not customer then
 		return
 	end
-	local wish = customer.model:FindFirstChildWhichIsA("BillboardGui", true)
-	if wish then
-		wish:FindFirstChildWhichIsA("TextLabel").Text = "😋"
-	end
+	NpcModel.setBubble(customer.model, bubble or "😋")
 	self:_walk(id, exit, function()
-		customer.model:Destroy()
-		customer.driver:Destroy()
-		self.customers[id] = nil
+		self:_remove(id)
 	end)
 end
 
--- Removes every customer at once (the plot was freed).
-function CustomerView:clear()
-	for id, customer in self.customers do
+function CustomerView:_remove(id: number)
+	local customer = self.customers[id]
+	if customer then
 		if customer.tween then
 			customer.tween:Cancel()
 		end
 		customer.model:Destroy()
 		customer.driver:Destroy()
 		self.customers[id] = nil
+	end
+end
+
+-- Removes every customer at once (the plot was freed).
+function CustomerView:clear()
+	for id in self.customers do
+		self:_remove(id)
 	end
 end
 
