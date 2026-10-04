@@ -39,3 +39,30 @@ t.test("missing a day starts the streak over", function()
 	t.expect(Daily.nextStreak(state, 502)).toBe(1)
 	t.expect(Daily.claim(DAILY, state, 502)).toBe(100)
 end)
+
+local Codes = require("../src/shared/Rules/Codes")
+local CODES = { SWEET = { cash = 500 }, OLD = { cash = 100, expires = 1000 } }
+
+t.test("codes ignore case and spaces", function()
+	t.expect(Codes.normalize(" sw eet ")).toBe("SWEET")
+	t.expect(Codes.redeem(CODES, {}, "sweet", 0)).toEqual({ cash = 500 })
+end)
+
+t.test("each code works once per player", function()
+	local redeemed = {}
+	Codes.redeem(CODES, redeemed, "SWEET", 0)
+	t.expect(select(2, Codes.redeem(CODES, redeemed, "SWEET", 0))).toBe("used")
+	t.expect(Codes.redeem(CODES, {}, "SWEET", 0)).toEqual({ cash = 500 }) -- another player
+end)
+
+t.test("unknown and expired codes are refused", function()
+	t.expect(select(2, Codes.redeem(CODES, {}, "NOPE", 0))).toBe("invalid")
+	t.expect(select(2, Codes.redeem(CODES, {}, "OLD", 1000))).toBe("expired")
+	t.expect(Codes.redeem(CODES, {}, "OLD", 999)).toEqual({ cash = 100, expires = 1000 })
+end)
+
+t.test("a refused code isn't marked as used", function()
+	local redeemed = {}
+	Codes.redeem(CODES, redeemed, "OLD", 2000)
+	t.expect(redeemed).toEqual({})
+end)

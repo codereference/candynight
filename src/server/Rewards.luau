@@ -3,6 +3,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Codes = require(ReplicatedStorage.Shared.Rules.Codes)
 local Config = require(ReplicatedStorage.Shared.Config)
 local Daily = require(ReplicatedStorage.Shared.Rules.Daily)
 local Format = require(ReplicatedStorage.Shared.Format)
@@ -39,7 +40,35 @@ function Rewards.claimDaily(session): number?
 	return amount
 end
 
+local lastCodeTry: { [Player]: number } = {}
+local CODE_COOLDOWN = 2 -- seconds between attempts, so codes can't be brute-forced
+
+function Rewards.redeemCode(session, text: string): (boolean, string?)
+	local now = os.clock()
+	if now - (lastCodeTry[session.player] or 0) < CODE_COOLDOWN then
+		return false, "slow"
+	end
+	lastCodeTry[session.player] = now
+	local entry, reason = Codes.redeem(Config.Codes, session.profile.codes, text, os.time())
+	if entry == nil then
+		return false, reason
+	end
+	local amount = session:earn(entry.cash)
+	session:notify("Codes.Redeemed", { cash = Format.cash(amount) })
+	return true, nil
+end
+
 function Rewards.start()
+	Net.func("RedeemCode").OnServerInvoke = function(player, text)
+		local session = Sessions.get(player)
+		if session == nil or type(text) ~= "string" or #text > 40 then
+			return false, "invalid"
+		end
+		return Rewards.redeemCode(session, text)
+	end
+	game:GetService("Players").PlayerRemoving:Connect(function(player)
+		lastCodeTry[player] = nil
+	end)
 	Sessions.started.Event:Connect(Rewards.publishDaily)
 	Net.func("ClaimDaily").OnServerInvoke = function(player)
 		local session = Sessions.get(player)

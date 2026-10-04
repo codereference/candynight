@@ -11,6 +11,7 @@ local NightHud = require(script.NightHud)
 local RebirthPanel = require(script.RebirthPanel)
 local WelcomeBack = require(script.WelcomeBack)
 local DailyPanel = require(script.DailyPanel)
+local CodesPanel = require(script.CodesPanel)
 local Toasts = require(script.Toasts)
 local Format = require(ReplicatedStorage.Shared.Format)
 
@@ -25,6 +26,7 @@ NightHud.mount(playerGui)
 DefensePlacement.mount(playerGui)
 RebirthPanel.mount(playerGui)
 DailyPanel.mount(playerGui)
+CodesPanel.mount(playerGui)
 
 local cash = player:WaitForChild("leaderstats"):WaitForChild("Cash") :: IntValue
 CashHud.mount(playerGui, cash, Format.cash)

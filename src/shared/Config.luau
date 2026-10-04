@@ -134,6 +134,12 @@ return {
 		rewards = { 100, 250, 500, 1000, 2000, 3500, 6000 }, -- day 1..7; day 7 repeats after
 	},
 
+	-- Redeemable codes for YouTubers and socials. UPPERCASE keys; expires = unix seconds (optional).
+	Codes = {
+		SWEETNIGHTS = { cash = 500 },
+		RELEASE = { cash = 1000 },
+	},
+
 	-- Roblox badge asset ids per badge key (see Badges). 0 = not created yet (see #28).
 	Badges = {
 		FirstSale = 0,

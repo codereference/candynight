@@ -98,6 +98,16 @@ local EN: { [string]: string } = {
 	["Daily.Claimed"] = "🎁 Day {day} reward: {cash}!",
 	["Ui.Close"] = "Close",
 
+	["Codes.Button"] = "🎟️ Codes",
+	["Codes.Title"] = "Enter a code",
+	["Codes.Placeholder"] = "Type a code…",
+	["Codes.Redeem"] = "Redeem",
+	["Codes.Redeemed"] = "🎟️ Code redeemed: {cash}!",
+	["Codes.Reason.invalid"] = "That code doesn't exist.",
+	["Codes.Reason.expired"] = "That code has expired.",
+	["Codes.Reason.used"] = "You already used that code.",
+	["Codes.Reason.slow"] = "Slow down a little!",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 
