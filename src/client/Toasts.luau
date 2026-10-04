@@ -39,7 +39,7 @@ function Toasts.mount(playerGui: Instance)
 	local gui = Ui.screen("Toasts", playerGui, 10)
 	holder = Ui.new("Frame", {
 		AnchorPoint = Vector2.new(0.5, 1),
-		Position = UDim2.new(0.5, 0, 1, -120),
+		Position = UDim2.new(0.5, 0, 1, -170), -- above the tutorial card and placement buttons
 		Size = UDim2.fromOffset(320, 200),
 		BackgroundTransparency = 1,
 		Parent = gui,

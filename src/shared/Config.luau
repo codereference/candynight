@@ -77,6 +77,7 @@ return {
 		biteRange = 4.5,
 		restAfterScare = 1.5,
 		bounty = 6, -- cash for defeating one, plus 1 per night number
+		practiceCount = 2, -- shadows on a player's first (practice) night
 	},
 
 	-- Handheld weapons (see WeaponRules). Melee hits everything in range; ranged auto-aims.

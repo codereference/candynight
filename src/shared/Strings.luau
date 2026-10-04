@@ -182,6 +182,14 @@ local EN: { [string]: string } = {
 	["Admin.Failed"] = "❌ Couldn't do that ({reason})",
 	["Admin.ResetKick"] = "Your data was reset by an admin. Rejoin to start fresh!",
 
+	["Night.Practice"] = "🌙 The sun went down… shadows are coming! Tap to swing your Rolling Pin and keep customers safe. This first night is just practice!",
+	["Tutorial.Serve"] = "👋 A customer is here! Walk to the counter and press Serve.",
+	["Tutorial.BuyTray"] = "🧁 Step on the green Cupcake Tray button to buy it. Better treats = more cash!",
+	["Tutorial.BuyMore"] = "✨ Keep serving and buy more upgrades from the buttons.",
+	["Tutorial.Hire"] = "👩‍🍳 Save up and hire a Baker. They'll serve customers for you!",
+	["Tutorial.Defend"] = "🛡️ Nights get spooky! Open 🛡️ Defenses and place a Gumdrop Turret.",
+	["Tutorial.Skip"] = "Skip tips",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 

@@ -275,6 +275,9 @@ function PlotRuntime:beginNight()
 	end
 	self:applyBoosts()
 	self:_publishNight()
+	if self.outcome.forgiving then
+		self.session:notify("Night.Practice")
+	end
 end
 
 -- A shadow creature scared a customer away.

@@ -25,6 +25,7 @@ local Monetization = require(script.Monetization)
 local Products = require(script.Products)
 local Style = require(script.Style)
 local AdminService = require(script.AdminService)
+local Onboarding = require(script.Onboarding)
 local Net = require(ReplicatedStorage.Shared.Net)
 
 local plots = Plots.new(Config.Plots.count)
@@ -64,6 +65,7 @@ Monetization.start()
 Products.start(runtimeOf)
 Style.start(runtimeOf, PlotRuntime.weaponsGiven, Monetization.perksChanged)
 AdminService.start(runtimeOf)
+Onboarding.start()
 
 local function onPlayerAdded(player: Player)
 	local session = Sessions.start(player) -- yields while the save loads

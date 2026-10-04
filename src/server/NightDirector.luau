@@ -13,8 +13,8 @@ local NightDirector = {}
 
 local horde = Horde.new()
 local creatures = {} -- [id] = { id, runtime, model, position, speed, targetId }
-local waves = {} -- [runtime] = Wave
-local plan = nil
+local waves = {} -- [runtime] = { wave = Wave, plan = plan }
+local plan = nil -- tonight's normal plan
 local elapsed = 0
 NightDirector.modifiers = {} -- set by events (Blood Moon); multipliers for Wave.plan
 NightDirector.creatureDefeated = Instance.new("BindableEvent") -- fires (runtime, byPlayer?)
@@ -25,8 +25,8 @@ local function flat(v: Vector3): Vector3
 	return Vector3.new(v.X, 0, v.Z)
 end
 
-local function spawnCreature(runtime)
-	local id = horde:spawn(plan.health)
+local function spawnCreature(runtime, creaturePlan)
+	local id = horde:spawn(creaturePlan.health)
 	local spot = SPAWNS[math.random(#SPAWNS)]
 	local position = runtime.view.at(spot[1], 0, spot[2]).Position
 	creatures[id] = {
@@ -34,8 +34,8 @@ local function spawnCreature(runtime)
 		runtime = runtime,
 		model = CreatureView.make(id, runtime.view.model),
 		position = position,
-		speed = plan.speed * (0.9 + math.random() * 0.2),
-		bite = plan.bite,
+		speed = creaturePlan.speed * (0.9 + math.random() * 0.2),
+		bite = creaturePlan.bite,
 		biteTimer = 0,
 	}
 end
@@ -112,7 +112,20 @@ function NightDirector.startNight(runtimes, night: number)
 	for _, runtime in runtimes do
 		if runtime.owner then
 			runtime:beginNight()
-			waves[runtime] = Wave.new(plan, Config.Clock.nightLength, Config.Creatures.spawnWindow)
+			-- A player's very first night is a gentle practice round.
+			local shopPlan = plan
+			if runtime.outcome.forgiving then
+				shopPlan = {
+					count = math.min(plan.count, Config.Creatures.practiceCount),
+					health = math.floor(plan.health * 0.6),
+					speed = plan.speed * 0.8,
+					bite = math.floor(plan.bite * 0.5),
+				}
+			end
+			waves[runtime] = {
+				wave = Wave.new(shopPlan, Config.Clock.nightLength, Config.Creatures.spawnWindow),
+				plan = shopPlan,
+			}
 		end
 	end
 end
@@ -160,18 +173,18 @@ end
 function NightDirector.spawnAt(runtime, count: number)
 	plan = plan or Wave.plan(Config.Creatures, 1, NightDirector.modifiers)
 	for _ = 1, count do
-		spawnCreature(runtime)
+		spawnCreature(runtime, plan)
 	end
 end
 
 function NightDirector.tick(dt: number)
 	elapsed += dt
-	for runtime, wave in waves do
+	for runtime, entry in waves do
 		if runtime.owner == nil then
 			waves[runtime] = nil
 		else
-			for _ = 1, wave:tick(dt) do
-				spawnCreature(runtime)
+			for _ = 1, entry.wave:tick(dt) do
+				spawnCreature(runtime, entry.plan)
 			end
 		end
 	end
