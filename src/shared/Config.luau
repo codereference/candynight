@@ -5,6 +5,7 @@ return {
 
 	Save = {
 		dataStoreName = "SweetNights_v1",
+		leaderboardName = "BestStreak_v1",
 		autosaveSeconds = 60,
 	},
 
@@ -127,6 +128,20 @@ return {
 		capSeconds = 8 * 3600,
 		minSeconds = 60,
 		efficiency = 0.5,
+	},
+
+	-- Roblox badge asset ids per badge key (see Badges). 0 = not created yet (see #28).
+	Badges = {
+		FirstSale = 0,
+		FirstStaff = 0,
+		FirstDefense = 0,
+		FirstNight = 0,
+		Streak5 = 0,
+		Streak10 = 0,
+		Streak25 = 0,
+		Served1000 = 0,
+		FirstRebirth = 0,
+		Rebirth5 = 0,
 	},
 
 	Rebirth = {

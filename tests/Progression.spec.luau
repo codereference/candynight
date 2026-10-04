@@ -82,3 +82,25 @@ end)
 t.test("boosts apply to offline earnings too", function()
 	t.expect(Offline.earnings(OFFLINE, 400, { { interval = 4 } }, 10, 2)).toBe(1000)
 end)
+
+local Badges = require("../src/shared/Rules/Badges")
+
+t.test("a fresh profile has no badges to award", function()
+	t.expect(Badges.award(Profile.defaults())).toEqual({})
+end)
+
+t.test("reaching milestones awards their badges once", function()
+	local profile = Profile.defaults()
+	profile.stats.served = 1
+	profile.nightsSurvived = 1
+	profile.bestStreak = 6
+	t.expect(Badges.award(profile)).toEqual({ "FirstSale", "FirstNight", "Streak5" })
+	t.expect(Badges.award(profile)).toEqual({})
+	t.expect(profile.badges.Streak5).toBe(true)
+end)
+
+t.test("badges survive a rebirth because they're based on long-term stats", function()
+	local profile = Profile.defaults()
+	profile.rebirths = 1
+	t.expect(Badges.award(profile)).toEqual({ "FirstRebirth" })
+end)

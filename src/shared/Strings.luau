@@ -75,6 +75,21 @@ local EN: { [string]: string } = {
 	["Offline.Body"] = "Your staff kept the shop open for {time} and earned {cash}!",
 	["Offline.Collect"] = "Collect",
 
+	["Badge.Earned"] = "🏅 Badge unlocked: {name}!",
+	["Badge.FirstSale"] = "First Sale",
+	["Badge.FirstStaff"] = "Help Wanted",
+	["Badge.FirstDefense"] = "Sweet Defense",
+	["Badge.FirstNight"] = "Survived the Night",
+	["Badge.Streak5"] = "5 Night Streak",
+	["Badge.Streak10"] = "10 Night Streak",
+	["Badge.Streak25"] = "25 Night Streak",
+	["Badge.Served1000"] = "1,000 Happy Customers",
+	["Badge.FirstRebirth"] = "Reborn Baker",
+	["Badge.Rebirth5"] = "Legendary Baker",
+	["Leaderboard.Title"] = "🔥 Best Streaks 🔥",
+	["Leaderboard.Row"] = "{rank}. {name}: {streak}",
+	["Leaderboard.Unavailable"] = "Leaderboard loading…",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 
