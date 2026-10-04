@@ -155,6 +155,18 @@ return {
 		RELEASE = { cash = 1000 },
 	},
 
+	-- Gamepasses (see Entitlements). ids are Roblox gamepass ids; 0 = not created yet (see #28).
+	Monetization = {
+		ownerIds = { 5224066822 }, -- Sep_1264: every pass free, Owner tag, admin panel
+		extraHelperInterval = 3, -- seconds between serves for the Extra Helper pass worker
+		passes = {
+			DoubleCash = { id = 0, perk = "doubleCash", order = 1 },
+			VIP = { id = 0, perk = "vip", order = 2 },
+			ExtraHelper = { id = 0, perk = "extraHelper", order = 3 },
+			SweetStyle = { id = 0, perk = "sweetStyle", order = 4 },
+		},
+	},
+
 	-- Roblox badge asset ids per badge key (see Badges). 0 = not created yet (see #28).
 	Badges = {
 		FirstSale = 0,

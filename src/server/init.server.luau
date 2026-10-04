@@ -21,6 +21,7 @@ local Leaderboard = require(script.Leaderboard)
 local Rewards = require(script.Rewards)
 local Bonuses = require(script.Bonuses)
 local Events = require(ReplicatedStorage.Shared.Rules.Events)
+local Monetization = require(script.Monetization)
 local Net = require(ReplicatedStorage.Shared.Net)
 
 local plots = Plots.new(Config.Plots.count)
@@ -41,10 +42,17 @@ end
 
 -- Systems start before any player is handled, so none of them miss a join.
 Raids.init(runtimes)
+Monetization.perksChanged.Event:Connect(function(session)
+	local index = plots:plotOf(session.player.UserId)
+	if index then
+		runtimes[index]:refreshPerks()
+	end
+end)
 Achievements.start()
 Leaderboard.start()
 Rewards.start()
 Bonuses.start()
+Monetization.start()
 
 local function onPlayerAdded(player: Player)
 	local session = Sessions.start(player) -- yields while the save loads

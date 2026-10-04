@@ -205,6 +205,9 @@ local BUILDERS: { [string]: (any, Model) -> () } = {
 			ball(m, view.at(1.5 + i * 1.6, 4, 18), 1.2, color)
 		end
 	end,
+	PassHelper = function(view, m)
+		staff(view, m, -6, Color3.fromRGB(255, 225, 120))
+	end,
 	Staff4 = function(view, m)
 		staff(view, m, 7, Color3.fromRGB(255, 190, 220))
 	end,

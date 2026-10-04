@@ -116,6 +116,23 @@ local EN: { [string]: string } = {
 	["Event.BloodMoon"] = "🌕 Blood Moon! More shadows tonight, but double rewards!",
 	["Event.SpookySeason"] = "🎃 Spooky Season! Extra shadows and +50% rewards tonight!",
 
+	["Tag.Owner"] = "👑 Owner",
+	["Tag.VIP"] = "⭐ VIP",
+	["Store.Button"] = "🛒 Store",
+	["Store.Title"] = "🛒 Sweet Store",
+	["Store.Owned"] = "Owned ✓",
+	["Store.Buy"] = "Buy",
+	["Store.Soon"] = "Coming soon!",
+	["Store.Thanks"] = "💖 Thanks for buying {item}!",
+	["Pass.DoubleCash"] = "2x Cash",
+	["Pass.VIP"] = "VIP",
+	["Pass.ExtraHelper"] = "Extra Helper",
+	["Pass.SweetStyle"] = "Sweet Style",
+	["PassInfo.DoubleCash"] = "Double cash from every sale, forever!",
+	["PassInfo.VIP"] = "VIP tag, +10% income and VIP-only styles.",
+	["PassInfo.ExtraHelper"] = "A bonus worker who serves customers for you.",
+	["PassInfo.SweetStyle"] = "Unlocks every premium shop theme, weapon skin and trail.",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 

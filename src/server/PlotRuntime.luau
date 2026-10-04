@@ -185,7 +185,22 @@ function PlotRuntime:giveWeapons()
 end
 
 function PlotRuntime:_applyEffects()
-	self.shop:setEffects(self.tree:effects(self.session.profile.owned))
+	local effects = self.tree:effects(self.session.profile.owned)
+	local perks = self.session.perks or {}
+	if perks.extraHelper then
+		table.insert(effects.staff, { id = "PassHelper", interval = Config.Monetization.extraHelperInterval })
+		if self.view.items:FindFirstChild("PassHelper") == nil then
+			ItemsView.build(self.view, "PassHelper", true)
+		end
+	end
+	self.shop:setEffects(effects)
+end
+
+-- Gamepass perks changed (bought in-game, or ownership finished loading).
+function PlotRuntime:refreshPerks()
+	if self.shop then
+		self:_applyEffects()
+	end
 end
 
 function PlotRuntime:_showButtons()
