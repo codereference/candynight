@@ -18,6 +18,7 @@ local TurretDirector = require(script.TurretDirector)
 local Raids = require(script.Raids)
 local Achievements = require(script.Achievements)
 local Leaderboard = require(script.Leaderboard)
+local Rewards = require(script.Rewards)
 local Net = require(ReplicatedStorage.Shared.Net)
 
 local plots = Plots.new(Config.Plots.count)
@@ -35,6 +36,12 @@ for index = 1, Config.Plots.count do
 	local origin = if north then CFrame.new(position) * CFrame.Angles(0, math.pi, 0) else CFrame.new(position)
 	runtimes[index] = PlotRuntime.new(index, origin)
 end
+
+-- Systems start before any player is handled, so none of them miss a join.
+Raids.init(runtimes)
+Achievements.start()
+Leaderboard.start()
+Rewards.start()
 
 local function onPlayerAdded(player: Player)
 	local session = Sessions.start(player) -- yields while the save loads
@@ -72,10 +79,6 @@ Players.PlayerRemoving:Connect(function(player)
 	Weapons.forget(player)
 	Sessions.stop(player)
 end)
-
-Raids.init(runtimes)
-Achievements.start()
-Leaderboard.start()
 
 -- Defense requests from clients. Every argument is type-checked; the rules check everything else.
 local function runtimeOf(player: Player)

@@ -13,6 +13,7 @@ local DataStoreStorage = require(script.Parent.DataStoreStorage)
 local Net = require(ReplicatedStorage.Shared.Net)
 
 local Sessions = {}
+Sessions.started = Instance.new("BindableEvent") -- fires (session) once a player's save has loaded
 
 local Session = {}
 Session.__index = Session
@@ -52,6 +53,7 @@ function Sessions.start(player: Player)
 	session:syncCash()
 	session:refreshMultiplier()
 	active[player] = session
+	Sessions.started:Fire(session)
 	return session
 end
 

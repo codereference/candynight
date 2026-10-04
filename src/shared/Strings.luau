@@ -90,6 +90,14 @@ local EN: { [string]: string } = {
 	["Leaderboard.Row"] = "{rank}. {name}: {streak}",
 	["Leaderboard.Unavailable"] = "Leaderboard loading…",
 
+	["Daily.Title"] = "🎁 Daily Treats",
+	["Daily.Day"] = "Day {n}",
+	["Daily.Claim"] = "Claim!",
+	["Daily.Button"] = "🎁 Daily",
+	["Daily.ButtonReady"] = "🎁 Daily ❗",
+	["Daily.Claimed"] = "🎁 Day {day} reward: {cash}!",
+	["Ui.Close"] = "Close",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 
