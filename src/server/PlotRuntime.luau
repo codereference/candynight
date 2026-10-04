@@ -9,10 +9,12 @@ local NightOutcome = require(ReplicatedStorage.Shared.Rules.NightOutcome)
 local Shop = require(ReplicatedStorage.Shared.Rules.Shop)
 local Strings = require(ReplicatedStorage.Shared.Strings)
 local UnlockTree = require(ReplicatedStorage.Shared.Rules.UnlockTree)
+local WeaponRules = require(ReplicatedStorage.Shared.Rules.WeaponRules)
 local ButtonsView = require(script.Parent.ButtonsView)
 local CustomerView = require(script.Parent.CustomerView)
 local ItemsView = require(script.Parent.ItemsView)
 local PlotView = require(script.Parent.PlotView)
+local Weapons = require(script.Parent.Weapons)
 
 local PlotRuntime = {}
 PlotRuntime.__index = PlotRuntime
@@ -60,6 +62,7 @@ function PlotRuntime:assign(player: Player, session)
 	self:_applyEffects()
 	self:_showButtons()
 	self:_publishNight()
+	self:giveWeapons()
 	table.insert(
 		self.connections,
 		session.cashChanged.Event:Connect(function(cash)
@@ -100,11 +103,19 @@ function PlotRuntime:buy(id: string)
 		ItemsView.build(self.view, id, true)
 		self:_applyEffects()
 		self:_showButtons()
+		self:giveWeapons()
 		session:notify("Notify.Bought", { item = Strings.get("Button." .. id) })
 	elseif reason == "cash" then
 		local missing = self.tree:get(id).cost - session.wallet:getCash()
 		session:notify("Notify.NeedCash", { amount = Format.cash(missing) })
 	end
+end
+
+-- Puts every weapon the owner has earned into their backpack (call again after each respawn).
+function PlotRuntime:giveWeapons()
+	local profile = self.session.profile
+	local unlocked = self.tree:effects(profile.owned).weapons
+	Weapons.equip(self.owner, WeaponRules.owned(profile.weapons, unlocked))
 end
 
 function PlotRuntime:_applyEffects()

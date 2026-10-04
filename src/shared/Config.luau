@@ -75,6 +75,13 @@ return {
 		bounty = 6, -- cash for defeating one, plus 1 per night number
 	},
 
+	-- Handheld weapons (see WeaponRules). Melee hits everything in range; ranged auto-aims.
+	Weapons = {
+		RollingPin = { damage = 20, cooldown = 0.5, range = 8 },
+		CandyCaneSword = { damage = 40, cooldown = 0.45, range = 10 },
+		GumballBlaster = { damage = 30, cooldown = 0.3, range = 40, ranged = true },
+	},
+
 	-- Surviving a night (see NightOutcome).
 	Night = {
 		lossShare = 0.5, -- share of the night's customers you may lose on a 0 streak

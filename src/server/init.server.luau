@@ -13,6 +13,7 @@ local Sessions = require(script.Sessions)
 local Strings = require(ReplicatedStorage.Shared.Strings)
 local World = require(script.World)
 local NightDirector = require(script.NightDirector)
+local Weapons = require(script.Weapons)
 
 local plots = Plots.new(Config.Plots.count)
 local runtimes = {}
@@ -42,9 +43,15 @@ local function onPlayerAdded(player: Player)
 	end
 	local runtime = runtimes[index]
 	runtime:assign(player, session)
-	player.CharacterAdded:Connect(function()
-		task.defer(runtime.sendOwnerHome, runtime)
-	end)
+	local function onSpawn()
+		task.defer(function()
+			if runtime.owner == player then
+				runtime:sendOwnerHome()
+				runtime:giveWeapons()
+			end
+		end)
+	end
+	player.CharacterAdded:Connect(onSpawn)
 end
 
 Players.PlayerAdded:Connect(onPlayerAdded)
@@ -57,6 +64,7 @@ Players.PlayerRemoving:Connect(function(player)
 	if index then
 		runtimes[index]:release()
 	end
+	Weapons.forget(player)
 	Sessions.stop(player)
 end)
 

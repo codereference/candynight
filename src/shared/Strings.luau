@@ -22,6 +22,10 @@ local EN: { [string]: string } = {
 	["Night.FailedDetail"] = "Too many customers got scared away. You lost {cash} and {broken} defenses broke.",
 	["Ui.Ok"] = "OK",
 
+	["Weapon.RollingPin"] = "Rolling Pin",
+	["Weapon.CandyCaneSword"] = "Candy Cane Sword",
+	["Weapon.GumballBlaster"] = "Gumball Blaster",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 
