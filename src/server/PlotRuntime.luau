@@ -9,6 +9,7 @@ local Layout = require(ReplicatedStorage.Shared.Layout)
 local Format = require(ReplicatedStorage.Shared.Format)
 local Net = require(ReplicatedStorage.Shared.Net)
 local NightOutcome = require(ReplicatedStorage.Shared.Rules.NightOutcome)
+local Rebirth = require(ReplicatedStorage.Shared.Rules.Rebirth)
 local Shop = require(ReplicatedStorage.Shared.Rules.Shop)
 local Strings = require(ReplicatedStorage.Shared.Strings)
 local UnlockTree = require(ReplicatedStorage.Shared.Rules.UnlockTree)
@@ -27,6 +28,7 @@ PlotRuntime.tree = UnlockTree.new(Config.Buttons)
 PlotRuntime.grid = Grid.new(Layout)
 local DEFENSES = Config.Defenses.catalog
 PlotRuntime.nightEnded = Instance.new("BindableEvent") -- fires (runtime, result) after each shop's dawn
+PlotRuntime.reborn = Instance.new("BindableEvent") -- fires (runtime) after a rebirth
 
 local nightResultRemote = Net.event("NightResult")
 
@@ -64,14 +66,7 @@ function PlotRuntime:assign(player: Player, session)
 	self.view.setOwnerName(player.DisplayName)
 	player:SetAttribute("PlotIndex", self.index)
 
-	for _, id in self.tree:ownedInOrder(session.profile.owned) do
-		ItemsView.build(self.view, id, false)
-	end
-	self:_applyEffects()
-	self:_showButtons()
-	for _, entry in session.profile.placed do
-		self:_buildDefense(entry)
-	end
+	self:_buildShop()
 	self:_publishNight()
 	self:giveWeapons()
 	table.insert(
@@ -81,6 +76,43 @@ function PlotRuntime:assign(player: Player, session)
 		end)
 	)
 	self:sendOwnerHome()
+end
+
+-- Builds everything the owner owns: items, buttons, defenses. Used on join and after rebirth.
+function PlotRuntime:_buildShop()
+	local profile = self.session.profile
+	for _, id in self.tree:ownedInOrder(profile.owned) do
+		ItemsView.build(self.view, id, false)
+	end
+	self:_applyEffects()
+	self:_showButtons()
+	for _, entry in profile.placed do
+		self:_buildDefense(entry)
+	end
+end
+
+-- Resets the shop for a permanent income multiplier. Returns true, or false plus a reason key.
+function PlotRuntime:rebirth(): (boolean, string?)
+	local session = self.session
+	local ok, reason = Rebirth.apply(Config.Rebirth, session.profile, session.wallet)
+	session:syncCash()
+	if not ok then
+		return false, reason
+	end
+	self.buttons:clear()
+	self.view.items:ClearAllChildren()
+	self.view.defenses:ClearAllChildren()
+	table.clear(self.defenseModels)
+	self:_buildShop()
+	Weapons.reset(self.owner)
+	self:giveWeapons()
+	session:refreshMultiplier()
+	session:notify(
+		"Rebirth.Done",
+		{ mult = string.format("%.1f", Rebirth.multiplier(Config.Rebirth, session.profile.rebirths)) }
+	)
+	PlotRuntime.reborn:Fire(self)
+	return true, nil
 end
 
 function PlotRuntime:release()
@@ -155,7 +187,7 @@ function PlotRuntime:_applySale(sale)
 	if sale == nil then
 		return
 	end
-	self.session:earn(sale.cash)
+	self.session:earnSale(sale.cash)
 	self.session.profile.stats.served += 1
 	self.customers:leave(sale.customerId, self.view.exit)
 	if sale.staffId then

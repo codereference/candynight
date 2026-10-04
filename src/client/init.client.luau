@@ -8,6 +8,7 @@ local CashHud = require(script.CashHud)
 local ClockHud = require(script.ClockHud)
 local DefensePlacement = require(script.DefensePlacement)
 local NightHud = require(script.NightHud)
+local RebirthPanel = require(script.RebirthPanel)
 local Toasts = require(script.Toasts)
 local Format = require(ReplicatedStorage.Shared.Format)
 
@@ -19,6 +20,7 @@ Atmosphere.start()
 ClockHud.mount(playerGui)
 NightHud.mount(playerGui)
 DefensePlacement.mount(playerGui)
+RebirthPanel.mount(playerGui)
 
 local cash = player:WaitForChild("leaderstats"):WaitForChild("Cash") :: IntValue
 CashHud.mount(playerGui, cash, Format.cash)

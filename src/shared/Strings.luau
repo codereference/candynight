@@ -62,6 +62,15 @@ local EN: { [string]: string } = {
 	["Raid.Reason.locked"] = "You got caught tonight. Try again tomorrow night!",
 	["Raid.Reason.cooldown"] = "They're watching closely now. Try another shop!",
 
+	["Rebirth.Button"] = "🔁 Rebirth",
+	["Rebirth.Title"] = "Rebirth #{n}",
+	["Rebirth.Boost"] = "Income x{from} → x{to}",
+	["Rebirth.Cost"] = "Costs {cash}",
+	["Rebirth.Resets"] = "Resets your cash, shop, defenses and bought weapons. Keeps streaks, cosmetics and rewards.",
+	["Rebirth.Confirm"] = "Rebirth!",
+	["Rebirth.Done"] = "✨ Reborn! Income is now x{mult}",
+	["Ui.Cancel"] = "Cancel",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 

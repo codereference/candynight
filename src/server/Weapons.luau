@@ -132,6 +132,17 @@ function Weapons.equip(player: Player, ids: { string })
 	end
 end
 
+-- Takes every weapon away (rebirth); call equip afterwards with what's still owned.
+function Weapons.reset(player: Player)
+	for _, container in { player:FindFirstChildOfClass("Backpack"), player.Character } do
+		for _, tool in (container :: Instance):GetChildren() do
+			if tool:IsA("Tool") and tool:GetAttribute("WeaponId") then
+				tool:Destroy()
+			end
+		end
+	end
+end
+
 function Weapons.forget(player: Player)
 	lastSwing[player] = nil
 end

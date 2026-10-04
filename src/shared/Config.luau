@@ -122,6 +122,20 @@ return {
 		pvpDamageScale = 1, -- defender weapon damage multiplier against invaders
 	},
 
+	Rebirth = {
+		baseCost = 50000,
+		costGrowth = 2.5,
+		multiplierPerRebirth = 0.5, -- +50% income per rebirth
+	},
+
+	-- Boosts on shop sales (see Income).
+	Income = {
+		vipBonus = 0.1,
+		groupBonus = 0.1,
+		friendBonus = 0.1, -- per friend in the server
+		maxFriends = 3,
+	},
+
 	-- Surviving a night (see NightOutcome).
 	Night = {
 		lossShare = 0.5, -- share of the night's customers you may lose on a 0 streak

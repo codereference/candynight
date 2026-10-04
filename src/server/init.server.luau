@@ -99,6 +99,14 @@ Net.func("MoveDefense").OnServerInvoke = function(player, id, col, row, rot)
 	return runtime:moveDefense(id, col, row, rot)
 end
 
+Net.func("Rebirth").OnServerInvoke = function(player)
+	local runtime = runtimeOf(player)
+	if runtime == nil then
+		return false, "unknown"
+	end
+	return runtime:rebirth()
+end
+
 Net.func("SellDefense").OnServerInvoke = function(player, id)
 	local runtime = runtimeOf(player)
 	if not (runtime and isCell(id)) then

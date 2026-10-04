@@ -6,6 +6,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(ReplicatedStorage.Shared.Config)
 local Economy = require(ReplicatedStorage.Shared.Rules.Economy)
+local Income = require(ReplicatedStorage.Shared.Rules.Income)
+local Rebirth = require(ReplicatedStorage.Shared.Rules.Rebirth)
 local SaveSession = require(ReplicatedStorage.Shared.Persistence.SaveSession)
 local DataStoreStorage = require(script.Parent.DataStoreStorage)
 local Net = require(ReplicatedStorage.Shared.Net)
@@ -45,8 +47,10 @@ function Sessions.start(player: Player)
 		wallet = Economy.new(save.profile.cash),
 		cashValue = cash,
 		cashChanged = Instance.new("BindableEvent"), -- fires (cash) whenever cash changes
+		factors = {}, -- income boosts from passes, group, friends, events (see Income)
 	}, Session)
 	session:syncCash()
+	session:refreshMultiplier()
 	active[player] = session
 	return session
 end
@@ -99,6 +103,22 @@ function Session:earn(amount: number): number
 	local added = self.wallet:earn(amount)
 	self:syncCash()
 	return added
+end
+
+-- Total multiplier on shop sales right now. Systems set self.factors.* then call refreshMultiplier.
+function Session:multiplier(): number
+	self.factors.rebirthMultiplier = Rebirth.multiplier(Config.Rebirth, self.profile.rebirths)
+	return Income.multiplier(Config.Income, self.factors)
+end
+
+function Session:refreshMultiplier()
+	self.player:SetAttribute("Multiplier", self:multiplier())
+	self.player:SetAttribute("Rebirths", self.profile.rebirths)
+end
+
+-- Earnings from serving customers, with every boost applied.
+function Session:earnSale(amount: number): number
+	return self:earn(amount * self:multiplier())
 end
 
 function Session:spend(cost: number): boolean
