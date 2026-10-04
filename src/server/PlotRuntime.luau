@@ -20,6 +20,7 @@ local CustomerView = require(script.Parent.CustomerView)
 local DefenseView = require(script.Parent.DefenseView)
 local ItemsView = require(script.Parent.ItemsView)
 local PlotView = require(script.Parent.PlotView)
+local TurretDirector = require(script.Parent.TurretDirector)
 local Weapons = require(script.Parent.Weapons)
 
 local PlotRuntime = {}
@@ -270,6 +271,7 @@ function PlotRuntime:beginNight()
 	for _ in self.shop:getQueue() do
 		self.outcome:customerArrived() -- whoever's already in line is out in the dark too
 	end
+	self:applyBoosts()
 	self:_publishNight()
 end
 
@@ -419,6 +421,40 @@ function PlotRuntime:nearestStandingDefense(position: Vector3, radius: number): 
 		end
 	end
 	return bestId, bestPosition
+end
+
+-- Uses bought boosts if it's night (otherwise they wait for the next night).
+function PlotRuntime:applyBoosts()
+	local boosts = self.session.profile.boosts
+	if self.outcome == nil then
+		return
+	end
+	local used = false
+	if boosts.shield > 0 then
+		self.outcome:addAllowance(Config.Monetization.shieldAllowance * boosts.shield)
+		boosts.shield = 0
+		used = true
+	end
+	if boosts.overdrive > 0 and TurretDirector.overdrive[self] == nil then
+		TurretDirector.overdrive[self] = Config.Monetization.overdriveMultiplier
+		boosts.overdrive -= 1
+		used = true
+	end
+	if used then
+		self:_publishNight()
+		self.session:notify("Boost.Active")
+	end
+end
+
+-- Instant Repair: every defense back to full health.
+function PlotRuntime:repairAll()
+	for _, entry in self.session.profile.placed do
+		entry.hp = DEFENSES[entry.kind].hp
+		local model = self.defenseModels[entry.id]
+		if model then
+			DefenseView.setHealth(model, 1)
+		end
+	end
 end
 
 function PlotRuntime:breakDefense(id: number)

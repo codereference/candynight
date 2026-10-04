@@ -22,6 +22,7 @@ local Rewards = require(script.Rewards)
 local Bonuses = require(script.Bonuses)
 local Events = require(ReplicatedStorage.Shared.Rules.Events)
 local Monetization = require(script.Monetization)
+local Products = require(script.Products)
 local Net = require(ReplicatedStorage.Shared.Net)
 
 local plots = Plots.new(Config.Plots.count)
@@ -40,6 +41,11 @@ for index = 1, Config.Plots.count do
 	runtimes[index] = PlotRuntime.new(index, origin)
 end
 
+local function runtimeOf(player: Player)
+	local index = plots:plotOf(player.UserId)
+	return index and runtimes[index]
+end
+
 -- Systems start before any player is handled, so none of them miss a join.
 Raids.init(runtimes)
 Monetization.perksChanged.Event:Connect(function(session)
@@ -53,6 +59,7 @@ Leaderboard.start()
 Rewards.start()
 Bonuses.start()
 Monetization.start()
+Products.start(runtimeOf)
 
 local function onPlayerAdded(player: Player)
 	local session = Sessions.start(player) -- yields while the save loads
@@ -91,16 +98,11 @@ Players.PlayerRemoving:Connect(function(player)
 	Sessions.stop(player)
 end)
 
--- Defense requests from clients. Every argument is type-checked; the rules check everything else.
-local function runtimeOf(player: Player)
-	local index = plots:plotOf(player.UserId)
-	return index and runtimes[index]
-end
-
 local function isCell(n: any): boolean
 	return type(n) == "number" and n == n and n % 1 == 0 and math.abs(n) < 1000
 end
 
+-- Defense requests from clients. Every argument is type-checked; the rules check everything else.
 Net.func("PlaceDefense").OnServerInvoke = function(player, kind, col, row, rot)
 	local runtime = runtimeOf(player)
 	if not (runtime and type(kind) == "string" and isCell(col) and isCell(row) and isCell(rot)) then

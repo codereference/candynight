@@ -133,6 +133,14 @@ local EN: { [string]: string } = {
 	["PassInfo.ExtraHelper"] = "A bonus worker who serves customers for you.",
 	["PassInfo.SweetStyle"] = "Unlocks every premium shop theme, weapon skin and trail.",
 
+	["Product.InstantRepair"] = "🔧 Instant Repair",
+	["Product.TurretOverdrive"] = "⚡ Turret Overdrive",
+	["Product.NightShield"] = "🛡️ Night Shield",
+	["ProductInfo.InstantRepair"] = "Fixes every defense to full health right now.",
+	["ProductInfo.TurretOverdrive"] = "Defenses fire twice as fast for a whole night.",
+	["ProductInfo.NightShield"] = "3 more customers can get scared away without failing the night.",
+	["Boost.Active"] = "⚡ Boost active tonight!",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 

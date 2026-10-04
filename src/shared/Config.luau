@@ -165,6 +165,14 @@ return {
 			ExtraHelper = { id = 0, perk = "extraHelper", order = 3 },
 			SweetStyle = { id = 0, perk = "sweetStyle", order = 4 },
 		},
+		-- Developer products (repeat purchases). ids are Roblox product ids; 0 = not created yet.
+		products = {
+			InstantRepair = { id = 0, order = 5 },
+			TurretOverdrive = { id = 0, order = 6 },
+			NightShield = { id = 0, order = 7 },
+		},
+		overdriveMultiplier = 2, -- defenses fire this much faster for one night
+		shieldAllowance = 3, -- extra customers you may lose for one night
 	},
 
 	-- Roblox badge asset ids per badge key (see Badges). 0 = not created yet (see #28).

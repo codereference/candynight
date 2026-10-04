@@ -126,6 +126,24 @@ function StorePanel.mount(playerGui: Instance)
 		refresh()
 	end
 
+	local products = Config.Monetization.products
+	for _, key in sortedKeys(products) do
+		local product = products[key]
+		StorePanel.row(
+			list,
+			product.order,
+			Strings.get("Product." .. key),
+			Strings.get("ProductInfo." .. key),
+			function()
+				if product.id == 0 then
+					Toasts.show(Strings.get("Store.Soon"))
+				else
+					MarketplaceService:PromptProductPurchase(player, product.id)
+				end
+			end
+		)
+	end
+
 	Ui.button({
 		AnchorPoint = Vector2.new(0, 0.5),
 		Position = UDim2.new(0, 12, 0.5, 38),

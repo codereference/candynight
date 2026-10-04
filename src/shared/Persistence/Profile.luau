@@ -22,7 +22,8 @@ function Profile.defaults()
 		codes = {}, -- [code] = true
 		cosmetics = { owned = {}, equipped = {} },
 		tutorial = { step = 1, done = false, firstNightDone = false },
-		receipts = {}, -- [purchaseId] = true, for exactly-once dev products
+		receipts = {}, -- [purchaseId] = unix time granted, for exactly-once dev products
+		boosts = { overdrive = 0, shield = 0 }, -- bought boosts waiting for the next night
 		badges = {}, -- [badgeKey] = true
 		stats = { served = 0 },
 	}
