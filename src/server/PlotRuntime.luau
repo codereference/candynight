@@ -339,6 +339,22 @@ function PlotRuntime:damageDefense(id: number, amount: number): boolean
 	return destroyed
 end
 
+-- The closest standing defense within radius of a world position: id and position, or nil.
+function PlotRuntime:nearestStandingDefense(position: Vector3, radius: number): (number?, Vector3?)
+	local bestId, bestPosition, bestDistance = nil, nil, radius
+	for id, model in self.defenseModels do
+		local entry = Defenses.find(self.session.profile, id)
+		if entry and entry.hp > 0 then
+			local at = model:GetPivot().Position
+			local distance = Vector3.new(at.X - position.X, 0, at.Z - position.Z).Magnitude
+			if distance <= bestDistance then
+				bestId, bestPosition, bestDistance = id, at, distance
+			end
+		end
+	end
+	return bestId, bestPosition
+end
+
 function PlotRuntime:breakDefense(id: number)
 	self:damageDefense(id, math.huge)
 end

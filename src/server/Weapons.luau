@@ -3,11 +3,11 @@
 
 local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
 
 local Config = require(ReplicatedStorage.Shared.Config)
 local Strings = require(ReplicatedStorage.Shared.Strings)
 local WeaponRules = require(ReplicatedStorage.Shared.Rules.WeaponRules)
+local Effects = require(script.Parent.Effects)
 local NightDirector = require(script.Parent.NightDirector)
 
 local Weapons = {}
@@ -54,22 +54,6 @@ local function slash(tool: Tool)
 	Debris:AddItem(anim, 1)
 end
 
-local function shootGumball(from: Vector3, to: Vector3)
-	local ball = Instance.new("Part")
-	ball.Shape = Enum.PartType.Ball
-	ball.Size = Vector3.one * 0.9
-	ball.Anchored = true
-	ball.CanCollide = false
-	ball.CanQuery = false
-	ball.Material = Enum.Material.Neon
-	ball.Color = Color3.fromHSV(math.random(), 0.5, 1)
-	ball.Position = from
-	ball.Parent = workspace
-	local flight = (to - from).Magnitude / 120
-	TweenService:Create(ball, TweenInfo.new(flight, Enum.EasingStyle.Linear), { Position = to }):Play()
-	Debris:AddItem(ball, flight + 0.05)
-end
-
 local function swing(player: Player, id: string, tool: Tool)
 	local weapon = Config.Weapons[id]
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart") :: BasePart?
@@ -104,7 +88,7 @@ local function swing(player: Player, id: string, tool: Tool)
 	for _, hitId in WeaponRules.hits(weapon, { x = position.X, z = position.Z }, targets) do
 		local target = byId[hitId]
 		if weapon.ranged then
-			shootGumball(position + Vector3.new(0, 1.5, 0), Vector3.new(target.x, position.Y, target.z))
+			Effects.shoot(position + Vector3.new(0, 1.5, 0), Vector3.new(target.x, position.Y, target.z))
 		end
 		if target.hit then
 			target.hit(weapon.damage) -- e.g. an invading player

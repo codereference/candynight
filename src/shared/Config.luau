@@ -71,6 +71,9 @@ return {
 		speedGrowth = 0.03,
 		spawnWindow = 0.6, -- creatures arrive across the first 60% of the night
 		catchRadius = 3,
+		biteDamage = 10, -- damage per bite to a defense a creature is next to
+		biteInterval = 1, -- seconds between bites
+		biteRange = 4.5,
 		restAfterScare = 1.5,
 		bounty = 6, -- cash for defeating one, plus 1 per night number
 	},

@@ -14,6 +14,7 @@ local Strings = require(ReplicatedStorage.Shared.Strings)
 local World = require(script.World)
 local NightDirector = require(script.NightDirector)
 local Weapons = require(script.Weapons)
+local TurretDirector = require(script.TurretDirector)
 local Net = require(ReplicatedStorage.Shared.Net)
 
 local plots = Plots.new(Config.Plots.count)
@@ -116,6 +117,7 @@ World.phaseChanged.Event:Connect(function(phase, night)
 		NightDirector.startNight(runtimes, night)
 	else
 		NightDirector.endNight(runtimes)
+		TurretDirector.endNight()
 	end
 end)
 
@@ -130,6 +132,7 @@ end)
 RunService.Heartbeat:Connect(function(dt)
 	World.tick(dt)
 	NightDirector.tick(dt)
+	TurretDirector.tick(dt, runtimes)
 	for _, runtime in runtimes do
 		runtime:tick(dt)
 	end

@@ -66,13 +66,15 @@ local CREATURES = {
 	speed = 6,
 	speedGrowth = 0.1,
 	spawnWindow = 0.5,
+	biteDamage = 10,
 }
 
 t.test("later nights bring more, tougher, faster creatures, capped in number", function()
-	t.expect(Wave.plan(CREATURES, 1)).toEqual({ count = 3, health = 40, speed = 6 })
+	t.expect(Wave.plan(CREATURES, 1)).toEqual({ count = 3, health = 40, speed = 6, bite = 10 })
 	local third = Wave.plan(CREATURES, 3)
 	t.expect(third.count).toBe(7)
 	t.expect(third.health).toBe(80)
+	t.expect(third.bite).toBe(20)
 	t.expect(Wave.plan(CREATURES, 50).count).toBe(10)
 end)
 

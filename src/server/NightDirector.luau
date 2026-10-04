@@ -35,6 +35,8 @@ local function spawnCreature(runtime)
 		model = CreatureView.make(id, runtime.view.model),
 		position = position,
 		speed = plan.speed * (0.9 + math.random() * 0.2),
+		bite = plan.bite,
+		biteTimer = 0,
 	}
 end
 
@@ -73,6 +75,20 @@ local function moveCreature(creature, dt: number)
 		return -- still celebrating its last "boo!"
 	end
 	local runtime = creature.runtime
+
+	-- A defense in reach gets nibbled until it breaks; creatures stay put while biting.
+	local defenseId, defensePosition = runtime:nearestStandingDefense(creature.position, Config.Creatures.biteRange)
+	if defenseId then
+		creature.biteTimer -= dt
+		if creature.biteTimer <= 0 then
+			creature.biteTimer = Config.Creatures.biteInterval
+			runtime:damageDefense(defenseId, creature.bite)
+		end
+		local here = Vector3.new(creature.position.X, CreatureView.HOVER, creature.position.Z)
+		creature.model:PivotTo(CFrame.lookAt(here, Vector3.new(defensePosition.X, here.Y, defensePosition.Z)))
+		return
+	end
+
 	local customerId, target = nearestCustomer(creature)
 	if target == nil then
 		target = runtime.view.at(0, 0, -14).Position -- loiter near the counter

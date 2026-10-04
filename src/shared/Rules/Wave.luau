@@ -4,7 +4,7 @@
 local Wave = {}
 Wave.__index = Wave
 
--- config: { baseCount, countPerNight, maxCount, baseHealth, healthGrowth, speed, speedGrowth, spawnWindow }
+-- config: { baseCount, countPerNight, maxCount, baseHealth, healthGrowth, speed, speedGrowth, biteDamage, spawnWindow }
 -- modifiers (events like Blood Moon): { count?, health?, speed? } multipliers.
 function Wave.plan(config, night: number, modifiers)
 	modifiers = modifiers or {}
@@ -14,6 +14,7 @@ function Wave.plan(config, night: number, modifiers)
 		count = math.floor(count * (modifiers.count or 1)),
 		health = math.floor(config.baseHealth * (1 + step * config.healthGrowth) * (modifiers.health or 1)),
 		speed = config.speed * (1 + step * config.speedGrowth) * (modifiers.speed or 1),
+		bite = math.floor(config.biteDamage * (1 + step * config.healthGrowth) * (modifiers.health or 1)),
 	}
 end
 
