@@ -65,3 +65,16 @@ t.test("owned items come back in catalog order for rebuilding", function()
 	local owned = { Jar = true, Tray = true }
 	t.expect(UnlockTree.new(CATALOG):ownedInOrder(owned)).toEqual({ "Tray", "Jar" })
 end)
+
+t.test("a pack's contents stay hidden until the pack is bought", function()
+	local tree = UnlockTree.new({
+		{ id = "Pack", cost = 10, pack = true },
+		{ id = "Fountain", cost = 5, goods = 50, requires = "Pack" },
+	})
+	local owned, wallet = {}, Economy.new(100)
+	t.expect(tree:available(owned)).toEqual({ "Pack" })
+	local _, reason = tree:buy(owned, wallet, "Fountain")
+	t.expect(reason).toBe("locked")
+	tree:buy(owned, wallet, "Pack")
+	t.expect(tree:available(owned)).toEqual({ "Fountain" })
+end)

@@ -152,6 +152,62 @@ local BUILDERS: { [string]: (any, Model) -> () } = {
 	Staff3 = function(view, m)
 		staff(view, m, 3, Color3.fromRGB(255, 215, 120))
 	end,
+
+	-- Weapons pack: a little candy-striped stall at the front left of the plot.
+	WeaponsPack = function(view, m)
+		local stripe = Color3.fromRGB(230, 50, 70)
+		part(m, { Size = Vector3.new(10, 3.5, 3), CFrame = view.at(-23, 1.75, -16), Color = CREAM })
+		for _, x in { -27.5, -18.5 } do
+			part(m, { Size = Vector3.new(0.8, 8, 0.8), CFrame = view.at(x, 4, -15), Color = stripe })
+		end
+		part(m, { Size = Vector3.new(11, 0.6, 5), CFrame = view.at(-23, 8.2, -16), Color = stripe })
+		part(m, { Size = Vector3.new(10, 5, 0.5), CFrame = view.at(-23, 5.5, -13.5), Color = CHOC })
+	end,
+	CandyCaneSword = function(view, m)
+		part(m, {
+			Size = Vector3.new(0.4, 4, 0.4),
+			CFrame = view.at(-25, 5.5, -13.9) * CFrame.Angles(0, 0, math.rad(20)),
+			Color = Color3.fromRGB(240, 60, 80),
+			Material = Enum.Material.Neon,
+		})
+	end,
+	GumballBlaster = function(view, m)
+		part(m, { Size = Vector3.new(2.6, 1, 1), CFrame = view.at(-21, 5.5, -13.9), Color = MINT })
+		ball(m, view.at(-21.5, 6.3, -13.9), 1, Color3.fromRGB(255, 90, 160))
+	end,
+
+	-- Back shop house pack: a second building behind the shop.
+	BackHousePack = function(view, m)
+		local wall = Color3.fromRGB(200, 235, 255)
+		part(m, { Size = Vector3.new(24, 0.4, 16), CFrame = view.at(0, 0.2, 20), Color = CREAM })
+		part(m, { Size = Vector3.new(24, 9, 1), CFrame = view.at(0, 4.5, 28), Color = wall })
+		part(m, { Size = Vector3.new(1, 9, 16), CFrame = view.at(-12, 4.5, 20), Color = wall })
+		part(m, { Size = Vector3.new(1, 9, 16), CFrame = view.at(12, 4.5, 20), Color = wall })
+		part(m, { Size = Vector3.new(26, 1, 18), CFrame = view.at(0, 9.5, 20), Color = MINT })
+	end,
+	ChocolateFountain = function(view, m)
+		for tier, size in { 4, 3, 2 } do
+			part(m, {
+				Shape = Enum.PartType.Cylinder,
+				Size = Vector3.new(0.6, size, size),
+				CFrame = view.at(-6, tier * 1.2, 20) * CFrame.Angles(0, 0, math.rad(90)),
+				Color = CHOC,
+			})
+		end
+		ball(m, view.at(-6, 4.5, 20), 1, Color3.fromRGB(90, 50, 30))
+	end,
+	IceCreamBar = function(view, m)
+		part(
+			m,
+			{ Size = Vector3.new(8, 3.5, 2.5), CFrame = view.at(5, 1.75, 18), Color = Color3.fromRGB(255, 200, 220) }
+		)
+		for i, color in { PINK, MINT, Color3.fromRGB(255, 240, 180), CHOC } do
+			ball(m, view.at(1.5 + i * 1.6, 4, 18), 1.2, color)
+		end
+	end,
+	Staff4 = function(view, m)
+		staff(view, m, 7, Color3.fromRGB(255, 190, 220))
+	end,
 }
 ItemsView.BUILDERS = BUILDERS
 

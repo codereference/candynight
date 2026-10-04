@@ -11,10 +11,12 @@ Layout.EXIT = { x = 40, z = -40 }
 
 -- Areas defenses can't be placed on: { minX, maxX, minZ, maxZ }.
 Layout.ZONES = {
-	shop = { -12, 12, -10, 8 },
+	shop = { -12, 12, -12, 8 },
 	queue = { -4, 4, -32, -10 },
 	backHouse = { -12, 12, 12, 28 },
 	buttons = { 18, 32, -32, 32 },
+	weaponsStall = { -30, -16, -26, -14 },
+	ownerSign = { -27, -17, -32, -28 },
 }
 
 -- Defense grid: square cells covering the whole plot.

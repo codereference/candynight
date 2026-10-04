@@ -37,6 +37,15 @@ return {
 		{ id = "CakeStand", cost = 2000, goods = 40, requires = "Staff2" },
 		{ id = "NeonSign", cost = 3000, decor = 1, requires = "Flowers" },
 		{ id = "Staff3", cost = 5000, staff = 2, requires = "CakeStand" },
+
+		-- Expansion packs: buying one builds its area and reveals the buttons that require it.
+		{ id = "WeaponsPack", cost = 1500, pack = true, requires = "Staff2" },
+		{ id = "CandyCaneSword", cost = 2500, weapon = "CandyCaneSword", requires = "WeaponsPack" },
+		{ id = "GumballBlaster", cost = 9000, weapon = "GumballBlaster", requires = "CandyCaneSword" },
+		{ id = "BackHousePack", cost = 7500, pack = true, requires = "Staff3" },
+		{ id = "ChocolateFountain", cost = 10000, goods = 80, requires = "BackHousePack" },
+		{ id = "IceCreamBar", cost = 18000, goods = 150, requires = "ChocolateFountain" },
+		{ id = "Staff4", cost = 30000, staff = 1.5, requires = "IceCreamBar" },
 	},
 
 	Customer = {

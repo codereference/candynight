@@ -27,6 +27,13 @@ local EN: { [string]: string } = {
 	["Button.CakeStand"] = "Cake Stand",
 	["Button.NeonSign"] = "Neon Sign",
 	["Button.Staff3"] = "Hire Head Chef",
+	["Button.WeaponsPack"] = "📦 Weapons Pack",
+	["Button.CandyCaneSword"] = "Candy Cane Sword",
+	["Button.GumballBlaster"] = "Gumball Blaster",
+	["Button.BackHousePack"] = "📦 Back Shop House",
+	["Button.ChocolateFountain"] = "Chocolate Fountain",
+	["Button.IceCreamBar"] = "Ice Cream Bar",
+	["Button.Staff4"] = "Hire Pastry Chef",
 }
 
 Strings.EN = EN
