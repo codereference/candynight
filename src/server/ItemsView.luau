@@ -181,4 +181,31 @@ function ItemsView.build(view, id: string, pop: boolean?): Model?
 	return model
 end
 
+-- A worker does a happy little hop after serving someone.
+function ItemsView.cheer(view, id: string)
+	local item = view.items:FindFirstChild(id)
+	local worker = item and item:FindFirstChild("Worker")
+	if worker == nil or worker:GetAttribute("Hopping") then
+		return
+	end
+	worker:SetAttribute("Hopping", true)
+	local base = worker:GetPivot()
+	local driver = Instance.new("CFrameValue")
+	driver.Value = base
+	driver.Changed:Connect(function(value)
+		worker:PivotTo(value)
+	end)
+	local hop = TweenService:Create(
+		driver,
+		TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, true),
+		{ Value = base + Vector3.new(0, 1, 0) }
+	)
+	hop.Completed:Connect(function()
+		worker:PivotTo(base)
+		worker:SetAttribute("Hopping", nil)
+		driver:Destroy()
+	end)
+	hop:Play()
+end
+
 return ItemsView

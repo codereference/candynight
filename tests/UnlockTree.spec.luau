@@ -57,7 +57,8 @@ end)
 
 t.test("effects add up goods, decor and staff from everything owned", function()
 	local owned = { Tray = true, Walls = true, Sign = true, Baker = true, Jar = true }
-	t.expect(UnlockTree.new(CATALOG):effects(owned)).toEqual({ goods = 8, decor = 1, staff = { 4 }, weapons = {} })
+	t.expect(UnlockTree.new(CATALOG):effects(owned))
+		.toEqual({ goods = 8, decor = 1, staff = { { id = "Baker", interval = 4 } }, weapons = {} })
 end)
 
 t.test("owned items come back in catalog order for rebuilding", function()

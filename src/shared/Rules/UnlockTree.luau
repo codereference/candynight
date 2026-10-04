@@ -76,7 +76,7 @@ function UnlockTree:effects(owned)
 		effects.goods += entry.goods or 0
 		effects.decor += entry.decor or 0
 		if entry.staff then
-			table.insert(effects.staff, entry.staff)
+			table.insert(effects.staff, { id = id, interval = entry.staff })
 		end
 		if entry.weapon then
 			table.insert(effects.weapons, entry.weapon)

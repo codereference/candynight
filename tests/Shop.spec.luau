@@ -13,6 +13,21 @@ local function arrivals(events)
 	return ids
 end
 
+local function staffServes(events)
+	local served = {}
+	for _, event in events do
+		if event.kind == "CustomerServed" then
+			table.insert(served, event.staffId)
+		end
+	end
+	return served
+end
+
+local function withStaff(shop, staff)
+	shop:setEffects({ goods = 0, decor = 0, staff = staff })
+	return shop
+end
+
 t.test("first customer arrives on the first tick", function()
 	local shop = Shop.new(CONFIG)
 	t.expect(arrivals(shop:tick(0.1))).toEqual({ 1 })
@@ -82,4 +97,44 @@ t.test("decor can't push arrivals faster than the minimum interval", function()
 	local shop = Shop.new(CONFIG)
 	shop:setEffects({ goods = 0, decor = 100 })
 	t.expect(shop:arrivalInterval()).toBe(2)
+end)
+
+t.test("a worker serves on their own once their interval passes", function()
+	local shop = withStaff(Shop.new(CONFIG), { { id = "Baker", interval = 4 } })
+	shop:tick(0.1)
+	t.expect(staffServes(shop:tick(3.8))).toEqual({})
+	local served = shop:tick(0.2)
+	t.expect(staffServes(served)).toEqual({ "Baker" })
+	t.expect(served[1].cash).toBe(5)
+end)
+
+t.test("an idle worker serves the moment a customer arrives", function()
+	local shop = withStaff(Shop.new({ baseSale = 5, customerInterval = 10, minCustomerInterval = 1, maxQueue = 3 }), {
+		{ id = "Baker", interval = 2 },
+	})
+	shop:tick(0.1) -- customer 1 arrives
+	shop:tick(2) -- baker serves them and goes idle
+	t.expect(staffServes(shop:tick(5))).toEqual({})
+	t.expect(staffServes(shop:tick(5))).toEqual({ "Baker" }) -- customer 2 arrives at t=10
+end)
+
+t.test("several workers each serve on their own timers", function()
+	local shop = Shop.new({ baseSale = 5, customerInterval = 0.1, minCustomerInterval = 0.1, maxQueue = 10 })
+	shop:tick(5) -- a full line before anyone is hired
+	withStaff(shop, { { id = "A", interval = 2 }, { id = "B", interval = 3 } })
+	local served = {}
+	for _ = 1, 60 do
+		for _, id in staffServes(shop:tick(0.1)) do
+			served[id] = (served[id] or 0) + 1
+		end
+	end
+	t.expect(served).toEqual({ A = 3, B = 2 }) -- A at 2, 4, 6 and B at 3, 6
+end)
+
+t.test("hiring another worker doesn't reset the others", function()
+	local shop = withStaff(Shop.new(CONFIG), { { id = "A", interval = 4 } })
+	shop:tick(1)
+	withStaff(shop, { { id = "A", interval = 4 }, { id = "B", interval = 4 } })
+	shop:tick(1)
+	t.expect(staffServes(shop:tick(2.1))).toEqual({ "A" })
 end)

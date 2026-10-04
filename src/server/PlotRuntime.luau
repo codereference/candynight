@@ -124,6 +124,9 @@ function PlotRuntime:_applySale(sale)
 	self.session:earn(sale.cash)
 	self.session.profile.stats.served += 1
 	self.customers:leave(sale.customerId, self.view.exit)
+	if sale.staffId then
+		ItemsView.cheer(self.view, sale.staffId)
+	end
 	self:_refreshQueue()
 end
 
@@ -135,6 +138,8 @@ function PlotRuntime:tick(dt: number)
 	for _, event in events do
 		if event.kind == "CustomerArrived" then
 			self.customers:spawn(event.customerId, self.view.entrance)
+		elseif event.kind == "CustomerServed" then
+			self:_applySale(event)
 		end
 	end
 	if #events > 0 then

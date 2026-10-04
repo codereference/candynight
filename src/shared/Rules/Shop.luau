@@ -1,6 +1,8 @@
 -- Pure rules for one shop: customer arrivals, the queue, and serving.
 -- Time only moves through tick(dt), so tests can simulate hours instantly.
--- Results come back as events ({ kind = "CustomerArrived" | "CustomerServed", ... }) for adapters to show.
+-- Results come back as events for adapters to show:
+--   { kind = "CustomerArrived", customerId }
+--   { kind = "CustomerServed", customerId, cash, staffId? }  -- staffId is set when a worker served
 
 local Shop = {}
 Shop.__index = Shop
@@ -9,16 +11,23 @@ Shop.__index = Shop
 function Shop.new(config)
 	return setmetatable({
 		config = config,
-		effects = { goods = 0, decor = 0 },
+		effects = { goods = 0, decor = 0, staff = {} },
+		staffTimers = {}, -- [staffId] = seconds until that worker serves again
 		queue = {},
 		nextCustomerId = 1,
 		untilArrival = 0, -- the first customer shows up on the first tick
 	}, Shop)
 end
 
--- effects: { goods = extra cash per sale, decor = seconds off the arrival interval } (see UnlockTree:effects)
+-- effects: { goods, decor, staff = { { id, interval } } } (see UnlockTree:effects).
+-- Workers already on shift keep their timers; new hires start counting from now.
 function Shop:setEffects(effects)
 	self.effects = effects
+	local timers = {}
+	for _, worker in effects.staff or {} do
+		timers[worker.id] = self.staffTimers[worker.id] or worker.interval
+	end
+	self.staffTimers = timers
 end
 
 function Shop:saleValue(): number
@@ -49,6 +58,21 @@ function Shop:tick(dt: number)
 		table.insert(self.queue, id)
 		table.insert(events, { kind = "CustomerArrived", customerId = id })
 		self.untilArrival += self:arrivalInterval()
+	end
+
+	for _, worker in self.effects.staff or {} do
+		local timer = self.staffTimers[worker.id] - dt
+		while timer <= 0 do
+			local sale = self:serve()
+			if sale == nil then
+				timer = 0 -- idle: ready the moment someone gets in line
+				break
+			end
+			sale.staffId = worker.id
+			table.insert(events, sale)
+			timer += worker.interval
+		end
+		self.staffTimers[worker.id] = timer
 	end
 	return events
 end
