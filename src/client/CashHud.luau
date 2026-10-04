@@ -64,10 +64,10 @@ function CashHud.mount(playerGui: Instance, cash: IntValue, format: (number) -> 
 		local popup = label(gui, "+" .. format(gained))
 		popup.AnchorPoint = Vector2.new(0.5, 0)
 		popup.Size = UDim2.fromOffset(120, 34)
-		popup.Position = UDim2.new(0.5, 0, 0, 66)
+		popup.Position = UDim2.new(0.5, 0, 0, 108)
 		popup.TextColor3 = Color3.fromRGB(255, 240, 120)
 		local drift = TweenService:Create(popup, TweenInfo.new(0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-			Position = UDim2.new(0.5, 0, 0, 110),
+			Position = UDim2.new(0.5, 0, 0, 150),
 			TextTransparency = 1,
 		})
 		TweenService:Create(popup:FindFirstChildWhichIsA("UIStroke"), TweenInfo.new(0.9), { Transparency = 1 }):Play()

@@ -11,6 +11,9 @@ local EN: { [string]: string } = {
 	["Plot.ShopSign"] = "Sweet Shop",
 	["Kick.Full"] = "This server is full. Please try another one!",
 
+	["Clock.Day"] = "☀️ Day {n}  {time}",
+	["Clock.Night"] = "🌙 Night {n}  {time}",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 

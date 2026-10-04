@@ -11,6 +11,7 @@ local PlotRuntime = require(script.PlotRuntime)
 local PlotView = require(script.PlotView)
 local Sessions = require(script.Sessions)
 local Strings = require(ReplicatedStorage.Shared.Strings)
+local World = require(script.World)
 
 local plots = Plots.new(Config.Plots.count)
 local runtimes = {}
@@ -59,6 +60,7 @@ Players.PlayerRemoving:Connect(function(player)
 end)
 
 RunService.Heartbeat:Connect(function(dt)
+	World.tick(dt)
 	for _, runtime in runtimes do
 		runtime:tick(dt)
 	end

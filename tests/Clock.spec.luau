@@ -1,0 +1,46 @@
+local t = require("./lib/t")
+local Clock = require("../src/shared/Rules/Clock")
+
+local CONFIG = { dayLength = 100, nightLength = 50 }
+
+t.test("starts on the first day with the full day ahead", function()
+	local clock = Clock.new(CONFIG)
+	t.expect(clock.phase).toBe("Day")
+	t.expect(clock.night).toBe(0)
+	t.expect(clock.timeLeft).toBe(100)
+end)
+
+t.test("night falls when the day runs out, and nights are numbered", function()
+	local clock = Clock.new(CONFIG)
+	t.expect(clock:tick(99)).toEqual({})
+	t.expect(clock:tick(1)).toEqual({ { kind = "PhaseChanged", phase = "Night", night = 1 } })
+	t.expect(clock.timeLeft).toBe(50)
+end)
+
+t.test("dawn follows the night, then the next night is number 2", function()
+	local clock = Clock.new(CONFIG)
+	clock:tick(100)
+	t.expect(clock:tick(50)).toEqual({ { kind = "PhaseChanged", phase = "Day", night = 1 } })
+	clock:tick(100)
+	t.expect(clock.night).toBe(2)
+end)
+
+t.test("a long tick carries leftover time into the next phase", function()
+	local clock = Clock.new(CONFIG)
+	t.expect(#clock:tick(160)).toBe(2)
+	t.expect(clock.phase).toBe("Day")
+	t.expect(clock.timeLeft).toBe(90)
+end)
+
+t.test("progress runs from 0 to 1 through a phase", function()
+	local clock = Clock.new(CONFIG)
+	clock:tick(25)
+	t.expect(clock:progress()).toBe(0.25)
+end)
+
+t.test("skipping jumps to the next phase with its full length", function()
+	local clock = Clock.new(CONFIG)
+	clock:tick(10)
+	t.expect(clock:skip()).toEqual({ { kind = "PhaseChanged", phase = "Night", night = 1 } })
+	t.expect(clock.timeLeft).toBe(50)
+end)

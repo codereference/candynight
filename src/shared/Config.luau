@@ -48,6 +48,18 @@ return {
 		{ id = "Staff4", cost = 30000, staff = 1.5, requires = "IceCreamBar" },
 	},
 
+	Clock = {
+		dayLength = 150, -- seconds
+		nightLength = 90,
+	},
+
+	-- Asset ids like "rbxassetid://123". Empty = silent (pick tracks before launch, see #28).
+	Audio = {
+		dayMusic = "",
+		nightMusic = "",
+		musicVolume = 0.4,
+	},
+
 	Customer = {
 		walkSpeed = 10, -- studs per second
 		queueSpacing = 4, -- studs between customers in line
