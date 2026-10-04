@@ -205,6 +205,20 @@ return {
 		},
 	},
 
+	-- Uploaded mesh asset ids for the Blender meshes in assets/meshes (see README, Art). 0 = keep
+	-- the placeholder parts.
+	Meshes = {
+		CandyCane = 0,
+		ChefHat = 0,
+		CottonCandy = 0,
+		CustomerBody = 0,
+		Gumdrop = 0,
+		Oven = 0,
+		Peppermint = 0,
+		RollingPin = 0,
+		ShadowBody = 0,
+	},
+
 	-- Limited-time events (see Events). First match wins. Dates are unix seconds (UTC).
 	Events = {
 		{

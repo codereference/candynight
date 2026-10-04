@@ -1,6 +1,8 @@
 -- Cute placeholder NPCs (customers, staff) built from parts. Origin is at ground level, facing -Z.
 -- Parts are anchored and non-colliding; callers move the whole model with PivotTo.
 
+local Meshes = require(script.Parent.Meshes)
+
 local NpcModel = {}
 
 NpcModel.BODY_HEIGHT = 2.6
@@ -64,6 +66,11 @@ function NpcModel.make(name: string, options): Model
 		})
 	end
 	model.PrimaryPart = body
+	Meshes.dress(body, "CustomerBody")
+	local hat = model:FindFirstChild("Hat") :: BasePart?
+	if hat and Meshes.dress(hat, "ChefHat", Vector3.new(1.8, 1.6, 1.8)) then
+		hat.CFrame = CFrame.new(hat.Position) -- the placeholder cylinder is turned on its side; the mesh isn't
+	end
 
 	if options.bubble then
 		local bubble = Instance.new("BillboardGui")

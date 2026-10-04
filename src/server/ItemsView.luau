@@ -6,6 +6,7 @@ local TweenService = game:GetService("TweenService")
 
 local Layout = require(ReplicatedStorage.Shared.Layout)
 local Strings = require(ReplicatedStorage.Shared.Strings)
+local Meshes = require(script.Parent.Meshes)
 local NpcModel = require(script.Parent.NpcModel)
 
 local ItemsView = {}
@@ -90,7 +91,11 @@ local BUILDERS: { [string]: (any, Model) -> () } = {
 		label.Parent = gui
 	end,
 	Oven = function(view, m)
-		part(m, { Size = Vector3.new(5, 5, 3), CFrame = view.at(-7, 2.5, 5), Color = Color3.fromRGB(230, 230, 240) })
+		local body = part(
+			m,
+			{ Size = Vector3.new(5, 5, 3), CFrame = view.at(-7, 2.5, 5), Color = Color3.fromRGB(230, 230, 240) }
+		)
+		Meshes.dress(body, "Oven")
 		part(m, {
 			Size = Vector3.new(3, 2, 0.2),
 			CFrame = view.at(-7, 2.5, 3.45),

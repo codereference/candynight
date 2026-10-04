@@ -4,6 +4,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Layout = require(ReplicatedStorage.Shared.Layout)
+local Meshes = require(script.Parent.Meshes)
 
 local DefenseView = {}
 
@@ -102,6 +103,20 @@ function DefenseView.build(view, entry): Model
 	local model = Instance.new("Model")
 	model.Name = entry.kind
 	LOOKS[entry.kind](model)
+	local head = model:FindFirstChild("Head") :: BasePart
+	if entry.kind == "GumdropTurret" then
+		Meshes.dress(head, "Gumdrop")
+	elseif entry.kind == "PeppermintCannon" then
+		Meshes.dress(head, "Peppermint", Vector3.new(3, 3, 0.8))
+	elseif entry.kind == "CottonCandyZapper" and Meshes.dress(head, "CottonCandy", Vector3.new(3.4, 2.6, 3)) then
+		local fluff = {}
+		for _, p in model:GetChildren() do
+			if p.Name == "Fluff" then
+				table.insert(fluff, p)
+			end
+		end
+		Meshes.hide(fluff)
+	end
 	for _, p in model:GetChildren() do
 		p:SetAttribute("Colour", (p :: BasePart).Color) -- remembered for when it's repaired
 	end

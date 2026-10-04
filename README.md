@@ -56,6 +56,29 @@ lune run tests/run
 stylua src tests
 ```
 
+**Run every check** (tests, formatting, Rojo build, luau-lsp type analysis):
+
+```bash
+scripts/check.sh
+```
+
+### Art: low-poly meshes
+
+`blender/generate_meshes.py` builds every mesh from code and exports single-colour OBJ files to
+`assets/meshes/`, plus `src/shared/MeshSizes.luau` (each mesh's native size). Regenerate with:
+
+```bash
+/Applications/Blender.app/Contents/MacOS/Blender -b --python blender/generate_meshes.py
+```
+
+Roblox can't load mesh files at runtime, so each OBJ has to be uploaded once:
+
+1. In Studio, open **Asset Manager → Bulk Import** and select everything in `assets/meshes/`.
+2. Right-click each imported mesh and choose **Copy Asset ID**.
+3. Paste each id into `Meshes` in `src/shared/Config.luau`.
+
+Until an id is set, the game keeps its placeholder parts, so nothing breaks while you go.
+
 ### Layout
 
 - `src/shared/Rules/`: pure game rules (no Roblox APIs), covered by `tests/*.spec.luau`

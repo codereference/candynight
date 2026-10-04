@@ -4,6 +4,8 @@
 local Debris = game:GetService("Debris")
 local TweenService = game:GetService("TweenService")
 
+local Meshes = require(script.Parent.Meshes)
+
 local CreatureView = {}
 
 local BODY = Color3.fromRGB(70, 40, 105)
@@ -29,7 +31,16 @@ function CreatureView.make(id: number, parent: Instance): Model
 	end
 
 	local body = part({ Name = "Body", Size = Vector3.one * 3.4, Color = BODY, Transparency = 0.12, CanQuery = true })
-	part({ Name = "Wisp", Size = Vector3.one * 1.8, Color = BODY, Transparency = 0.35, CFrame = CFrame.new(0, -1.4, 1) })
+	local wisp = part({
+		Name = "Wisp",
+		Size = Vector3.one * 1.8,
+		Color = BODY,
+		Transparency = 0.35,
+		CFrame = CFrame.new(0, -1.4, 1),
+	})
+	if Meshes.dress(body, "ShadowBody", Vector3.new(3.4, 3.6, 3.8)) then
+		Meshes.hide({ wisp }) -- the mesh has its own tail
+	end
 	for _, x in { -0.6, 0.6 } do
 		part({
 			Name = "Eye",

@@ -8,6 +8,7 @@ local Config = require(ReplicatedStorage.Shared.Config)
 local Strings = require(ReplicatedStorage.Shared.Strings)
 local WeaponRules = require(ReplicatedStorage.Shared.Rules.WeaponRules)
 local Effects = require(script.Parent.Effects)
+local Meshes = require(script.Parent.Meshes)
 local NightDirector = require(script.Parent.NightDirector)
 
 local Weapons = {}
@@ -31,15 +32,20 @@ end
 
 local LOOKS: { [string]: (Tool) -> () } = {
 	RollingPin = function(tool)
-		handlePart(tool, { Name = "Handle", Size = Vector3.new(0.6, 0.6, 3.4), Color = Color3.fromRGB(222, 184, 135) })
+		local handle = handlePart(
+			tool,
+			{ Name = "Handle", Size = Vector3.new(0.6, 0.6, 3.4), Color = Color3.fromRGB(222, 184, 135) }
+		)
+		Meshes.dress(handle, "RollingPin")
 	end,
 	CandyCaneSword = function(tool)
-		handlePart(tool, {
+		local handle = handlePart(tool, {
 			Name = "Handle",
 			Size = Vector3.new(0.4, 0.4, 4.2),
 			Color = Color3.fromRGB(240, 60, 80),
 			Material = Enum.Material.Neon,
 		})
+		Meshes.dress(handle, "CandyCane", Vector3.new(1.4, 0.4, 4.2))
 	end,
 	GumballBlaster = function(tool)
 		handlePart(tool, { Name = "Handle", Size = Vector3.new(0.8, 0.9, 2.4), Color = Color3.fromRGB(110, 210, 160) })
