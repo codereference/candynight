@@ -28,7 +28,10 @@ for index = 1, Config.Plots.count do
 end
 
 local function onPlayerAdded(player: Player)
-	local session = Sessions.start(player)
+	local session = Sessions.start(player) -- yields while the save loads
+	if session == nil then
+		return -- left while loading
+	end
 	local index = plots:claim(player.UserId)
 	if index == nil then
 		player:Kick("This server is full. Please try another one!")

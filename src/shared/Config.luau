@@ -3,6 +3,11 @@
 return {
 	startingCash = 0,
 
+	Save = {
+		dataStoreName = "SweetNights_v1",
+		autosaveSeconds = 60,
+	},
+
 	Plots = {
 		count = 6,
 		spacing = 80, -- studs between plot centres along a row
