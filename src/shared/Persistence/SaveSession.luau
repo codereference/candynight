@@ -5,7 +5,8 @@
 --   storage:release(key, data) -> ok: boolean        -- final save that also gives up the session lock
 -- Safety rule: if the load failed, this session never writes, so an outage can't wipe real progress.
 
-local Profile = require("./Profile")
+-- Classic require inside Roblox; Lune (tests) has no `script`, so it uses the file path.
+local Profile = if script then require(script.Parent.Profile) else require("./Profile")
 
 local SaveSession = {}
 SaveSession.__index = SaveSession

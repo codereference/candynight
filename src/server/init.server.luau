@@ -213,3 +213,5 @@ end)
 for _, player in Players:GetPlayers() do
 	task.spawn(onPlayerAdded, player)
 end
+
+print("[SweetNights] server started: " .. #runtimes .. " plots built")
