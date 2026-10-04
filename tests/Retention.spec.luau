@@ -66,3 +66,25 @@ t.test("a refused code isn't marked as used", function()
 	Codes.redeem(CODES, redeemed, "OLD", 2000)
 	t.expect(redeemed).toEqual({})
 end)
+
+local Events = require("../src/shared/Rules/Events")
+local EVENTS = {
+	{ id = "BloodMoon", everyNthNight = 5, modifiers = { health = 1.5, reward = 2 } },
+	{ id = "Spooky", startsAt = 1000, endsAt = 2000, modifiers = { reward = 1.5 } },
+}
+
+t.test("Blood Moon rises every fifth night", function()
+	t.expect(Events.forNight(EVENTS, 4, 0)).toBe(nil)
+	t.expect(Events.forNight(EVENTS, 5, 0).id).toBe("BloodMoon")
+	t.expect(Events.forNight(EVENTS, 10, 0).id).toBe("BloodMoon")
+end)
+
+t.test("dated events only run inside their window", function()
+	t.expect(Events.forNight(EVENTS, 1, 999)).toBe(nil)
+	t.expect(Events.forNight(EVENTS, 1, 1000).id).toBe("Spooky")
+	t.expect(Events.forNight(EVENTS, 1, 2000)).toBe(nil)
+end)
+
+t.test("when two events match, the first in the list wins", function()
+	t.expect(Events.forNight(EVENTS, 5, 1500).id).toBe("BloodMoon")
+end)

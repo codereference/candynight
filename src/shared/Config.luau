@@ -134,6 +134,21 @@ return {
 		rewards = { 100, 250, 500, 1000, 2000, 3500, 6000 }, -- day 1..7; day 7 repeats after
 	},
 
+	-- Limited-time events (see Events). First match wins. Dates are unix seconds (UTC).
+	Events = {
+		{
+			id = "BloodMoon",
+			everyNthNight = 5,
+			modifiers = { count = 1.5, health = 1.3, reward = 2 },
+		},
+		{
+			id = "SpookySeason",
+			startsAt = 1792022400, -- 2026-10-15
+			endsAt = 1793577600, -- 2026-11-02
+			modifiers = { count = 1.2, reward = 1.5 },
+		},
+	},
+
 	-- Redeemable codes for YouTubers and socials. UPPERCASE keys; expires = unix seconds (optional).
 	Codes = {
 		SWEETNIGHTS = { cash = 500 },

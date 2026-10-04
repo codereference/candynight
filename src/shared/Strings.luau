@@ -113,6 +113,9 @@ local EN: { [string]: string } = {
 	["Bonus.JoinGroup"] = "💗 Join our group for +10% income!",
 	["Bonus.Boost"] = "🍭 x{mult}",
 
+	["Event.BloodMoon"] = "🌕 Blood Moon! More shadows tonight, but double rewards!",
+	["Event.SpookySeason"] = "🎃 Spooky Season! Extra shadows and +50% rewards tonight!",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 

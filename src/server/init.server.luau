@@ -20,6 +20,7 @@ local Achievements = require(script.Achievements)
 local Leaderboard = require(script.Leaderboard)
 local Rewards = require(script.Rewards)
 local Bonuses = require(script.Bonuses)
+local Events = require(ReplicatedStorage.Shared.Rules.Events)
 local Net = require(ReplicatedStorage.Shared.Net)
 
 local plots = Plots.new(Config.Plots.count)
@@ -137,12 +138,32 @@ Net.func("RepairDefense").OnServerInvoke = function(player, id)
 	return runtime:repairDefense(id)
 end
 
+-- Tonight's event (Blood Moon, seasonal...): creature modifiers plus an income boost for everyone.
+local currentEvent = nil
+
+local function applyEventBoost(session)
+	session.factors.event = currentEvent and currentEvent.modifiers.reward
+	session:refreshMultiplier()
+	if currentEvent then
+		session:notify("Event." .. currentEvent.id)
+	end
+end
+Sessions.started.Event:Connect(applyEventBoost)
+
 World.phaseChanged.Event:Connect(function(phase, night)
 	if phase == "Night" then
+		currentEvent = Events.forNight(Config.Events, night, os.time())
+		NightDirector.modifiers = if currentEvent then currentEvent.modifiers else {}
 		NightDirector.startNight(runtimes, night)
 	else
 		NightDirector.endNight(runtimes)
 		TurretDirector.endNight()
+		currentEvent = nil
+		NightDirector.modifiers = {}
+	end
+	ReplicatedStorage:SetAttribute("Event", currentEvent and currentEvent.id)
+	for _, session in Sessions.all() do
+		applyEventBoost(session)
 	end
 end)
 
@@ -150,7 +171,8 @@ end)
 NightDirector.creatureDefeated.Event:Connect(function(_runtime, byPlayer: Player?)
 	local session = byPlayer and Sessions.get(byPlayer)
 	if session then
-		session:earn(Config.Creatures.bounty + World.night())
+		local eventBoost = if currentEvent then currentEvent.modifiers.reward or 1 else 1
+		session:earn((Config.Creatures.bounty + World.night()) * eventBoost)
 	end
 end)
 

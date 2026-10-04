@@ -13,6 +13,11 @@ local Atmosphere = {}
 local DAY_AMBIENT = Color3.fromRGB(140, 130, 140)
 local NIGHT_AMBIENT = Color3.fromRGB(90, 70, 140)
 local NIGHT_TINT = Color3.fromRGB(200, 185, 255)
+-- Events recolour the night (still friendly, never dark-red horror).
+local EVENT_LOOKS = {
+	BloodMoon = { ambient = Color3.fromRGB(130, 70, 100), tint = Color3.fromRGB(255, 190, 205) },
+	SpookySeason = { ambient = Color3.fromRGB(120, 80, 70), tint = Color3.fromRGB(255, 215, 170) },
+}
 local FADE = 0.15 -- share of a phase spent fading between day and night looks
 
 local function smooth(x: number): number
@@ -65,13 +70,16 @@ function Atmosphere.start()
 		local phase = ReplicatedStorage:GetAttribute("Phase") or "Day"
 		local _, progress = Atmosphere.phaseTime()
 		local n = nightness(phase, progress)
+		local look = EVENT_LOOKS[ReplicatedStorage:GetAttribute("Event") or ""]
+		local nightAmbient = if look then look.ambient else NIGHT_AMBIENT
+		local nightTint = if look then look.tint else NIGHT_TINT
 
 		-- Sun sweeps from morning to sunset by day, then the moon has the sky by night.
 		Lighting.ClockTime = if phase == "Day" then 8 + progress * 10 else (18 + progress * 12) % 24
-		Lighting.Ambient = DAY_AMBIENT:Lerp(NIGHT_AMBIENT, n)
-		Lighting.OutdoorAmbient = DAY_AMBIENT:Lerp(NIGHT_AMBIENT, n)
+		Lighting.Ambient = DAY_AMBIENT:Lerp(nightAmbient, n)
+		Lighting.OutdoorAmbient = DAY_AMBIENT:Lerp(nightAmbient, n)
 		Lighting.Brightness = 2.5 - n * 1.2
-		correction.TintColor = Color3.new(1, 1, 1):Lerp(NIGHT_TINT, n)
+		correction.TintColor = Color3.new(1, 1, 1):Lerp(nightTint, n)
 		correction.Saturation = -0.15 * n
 		haze.Density = 0.25 + 0.2 * n
 
