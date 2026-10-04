@@ -17,6 +17,7 @@ if ! cmp -s .cache/Strings.csv localization/Strings.csv; then
 fi
 stylua --check src tests
 rojo build -o .cache/check.rbxl > /dev/null
+lune run scripts/check-place .cache/check.rbxl
 rojo sourcemap -o .cache/sourcemap.json > /dev/null
 problems=$(luau-lsp analyze --definitions=.cache/globalTypes.d.luau --sourcemap=.cache/sourcemap.json src 2>&1 \
 	| grep -v -E '^\[(INFO|WARN)\]' || true)
