@@ -19,6 +19,7 @@ local Raids = require(script.Raids)
 local Achievements = require(script.Achievements)
 local Leaderboard = require(script.Leaderboard)
 local Rewards = require(script.Rewards)
+local Bonuses = require(script.Bonuses)
 local Net = require(ReplicatedStorage.Shared.Net)
 
 local plots = Plots.new(Config.Plots.count)
@@ -42,6 +43,7 @@ Raids.init(runtimes)
 Achievements.start()
 Leaderboard.start()
 Rewards.start()
+Bonuses.start()
 
 local function onPlayerAdded(player: Player)
 	local session = Sessions.start(player) -- yields while the save loads

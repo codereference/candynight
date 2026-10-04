@@ -1,6 +1,9 @@
 -- Cash pill at the top of the screen, with a "+$5" popup and a little bounce whenever cash goes up.
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+
+local Strings = require(ReplicatedStorage.Shared.Strings)
 
 local CashHud = {}
 
@@ -48,6 +51,22 @@ function CashHud.mount(playerGui: Instance, cash: IntValue, format: (number) -> 
 	local amount = label(pill, format(cash.Value))
 	amount.Size = UDim2.new(1, -24, 1, -12)
 	amount.Position = UDim2.fromOffset(12, 6)
+
+	-- Income boost badge hanging off the cash pill (rebirths, passes, group, friends, events).
+	local boost = label(pill, "")
+	boost.AnchorPoint = Vector2.new(0, 0.5)
+	boost.Position = UDim2.new(1, 8, 0.5, 0)
+	boost.Size = UDim2.fromOffset(80, 30)
+	boost.TextXAlignment = Enum.TextXAlignment.Left
+	local player = game:GetService("Players").LocalPlayer
+	local function refreshBoost()
+		local multiplier = player:GetAttribute("Multiplier") or 1
+		boost.Visible = multiplier > 1.001
+		boost.Text =
+			Strings.get("Bonus.Boost", { mult = string.format("%.2f", multiplier):gsub("0+$", ""):gsub("%.$", "") })
+	end
+	player:GetAttributeChangedSignal("Multiplier"):Connect(refreshBoost)
+	refreshBoost()
 
 	local shown = cash.Value
 	cash.Changed:Connect(function(value)

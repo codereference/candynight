@@ -108,6 +108,11 @@ local EN: { [string]: string } = {
 	["Codes.Reason.used"] = "You already used that code.",
 	["Codes.Reason.slow"] = "Slow down a little!",
 
+	["Bonus.Friend"] = "👯 Playing with friends: +{pct}% income!",
+	["Bonus.Group"] = "💗 Thanks for joining the group: +10% income!",
+	["Bonus.JoinGroup"] = "💗 Join our group for +10% income!",
+	["Bonus.Boost"] = "🍭 x{mult}",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 

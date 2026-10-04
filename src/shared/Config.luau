@@ -160,6 +160,11 @@ return {
 		multiplierPerRebirth = 0.5, -- +50% income per rebirth
 	},
 
+	-- The game's Roblox group (members get Income.groupBonus). 0 = not created yet (see #28).
+	Group = {
+		id = 0,
+	},
+
 	-- Boosts on shop sales (see Income).
 	Income = {
 		vipBonus = 0.1,
