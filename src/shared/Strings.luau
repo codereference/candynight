@@ -51,6 +51,17 @@ local EN: { [string]: string } = {
 	["Reason.rotation"] = "That didn't work.",
 	["Reason.full_hp"] = "It's already at full health.",
 
+	["Raid.Steal"] = "Sneak & Steal",
+	["Raid.Register"] = "Register",
+	["Raid.Warning"] = "⚠️ {name} is sneaking into your shop!",
+	["Raid.Stole"] = "🤫 You swiped {cash}!",
+	["Raid.Robbed"] = "😠 {name} swiped {cash} from your register!",
+	["Raid.Caught"] = "You got caught! No more sneaking tonight.",
+	["Raid.YouCaught"] = "🛡️ You caught {name}!",
+	["Raid.Reason.day"] = "Registers are locked during the day.",
+	["Raid.Reason.locked"] = "You got caught tonight. Try again tomorrow night!",
+	["Raid.Reason.cooldown"] = "They're watching closely now. Try another shop!",
+
 	["Notify.NeedCash"] = "You need {amount} more!",
 	["Notify.Bought"] = "Unlocked {item}!",
 

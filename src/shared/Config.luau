@@ -113,6 +113,15 @@ return {
 		},
 	},
 
+	-- Night raiding (see Raid).
+	Raid = {
+		stealShare = 0.1, -- share of the victim's cash per steal
+		stealCap = 1000, -- most one steal can take
+		stealCooldown = 45, -- seconds before robbing the same shop again
+		stealHoldSeconds = 1.5,
+		pvpDamageScale = 1, -- defender weapon damage multiplier against invaders
+	},
+
 	-- Surviving a night (see NightOutcome).
 	Night = {
 		lossShare = 0.5, -- share of the night's customers you may lose on a 0 streak

@@ -15,6 +15,7 @@ local World = require(script.World)
 local NightDirector = require(script.NightDirector)
 local Weapons = require(script.Weapons)
 local TurretDirector = require(script.TurretDirector)
+local Raids = require(script.Raids)
 local Net = require(ReplicatedStorage.Shared.Net)
 
 local plots = Plots.new(Config.Plots.count)
@@ -69,6 +70,8 @@ Players.PlayerRemoving:Connect(function(player)
 	Weapons.forget(player)
 	Sessions.stop(player)
 end)
+
+Raids.init(runtimes)
 
 -- Defense requests from clients. Every argument is type-checked; the rules check everything else.
 local function runtimeOf(player: Player)
