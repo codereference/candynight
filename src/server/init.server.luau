@@ -1,49 +1,44 @@
 -- Server entry point. Thin adapter: Roblox input and time go into the rules layer,
--- and the events that come back are shown in the world. Cash only ever changes here, on the server.
+-- and the events that come back are shown in the world. Cash only ever changes on the server.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local Shared = ReplicatedStorage.Shared
-local Config = require(Shared.Config)
-local Economy = require(Shared.Rules.Economy)
-local Shop = require(Shared.Rules.Shop)
+local Config = require(ReplicatedStorage.Shared.Config)
+local Plots = require(ReplicatedStorage.Shared.Rules.Plots)
+local PlotRuntime = require(script.PlotRuntime)
 local PlotView = require(script.PlotView)
-local CustomerView = require(script.CustomerView)
+local Sessions = require(script.Sessions)
 
-local wallets = {} -- [Player] = Economy wallet
-local cashValues: { [Player]: IntValue } = {} -- the leaderstats Cash the HUD reads
+local plots = Plots.new(Config.Plots.count)
+local runtimes = {}
 
-local plot = PlotView.build(CFrame.new(0, 0, 0), Config.Customer.queueSpacing)
-local shop = Shop.new(Config.Shop)
-local customers = CustomerView.new(Config.Customer.walkSpeed)
-local owner: Player? = nil -- one plot for now; ticket #3 brings six
-
-local function refreshQueue()
-	customers:layout(shop:getQueue(), plot.queueSlot)
-	plot.servePrompt.Enabled = #shop:getQueue() > 0
-end
-
-local function syncCash(player: Player)
-	cashValues[player].Value = wallets[player]:getCash()
+-- Two rows of plots facing each other across the road.
+PlotView.buildRoad(Config.Plots.spacing * 4)
+local perRow = math.ceil(Config.Plots.count / 2)
+for index = 1, Config.Plots.count do
+	local north = index <= perRow
+	local column = (if north then index else index - perRow) - (perRow + 1) / 2
+	local position =
+		Vector3.new(column * Config.Plots.spacing, 0, if north then -Config.Plots.rowOffset else Config.Plots.rowOffset)
+	-- Each plot's front (-Z) faces the road.
+	local origin = if north then CFrame.new(position) * CFrame.Angles(0, math.pi, 0) else CFrame.new(position)
+	runtimes[index] = PlotRuntime.new(index, origin)
 end
 
 local function onPlayerAdded(player: Player)
-	wallets[player] = Economy.new(Config.startingCash)
-
-	local leaderstats = Instance.new("Folder")
-	leaderstats.Name = "leaderstats"
-	local cash = Instance.new("IntValue")
-	cash.Name = "Cash"
-	cash.Parent = leaderstats
-	leaderstats.Parent = player
-	cashValues[player] = cash
-	syncCash(player)
-
-	if owner == nil then
-		owner = player
+	local session = Sessions.start(player)
+	local index = plots:claim(player.UserId)
+	if index == nil then
+		player:Kick("This server is full. Please try another one!")
+		return
 	end
+	local runtime = runtimes[index]
+	runtime:assign(player, session)
+	player.CharacterAdded:Connect(function()
+		task.defer(runtime.sendOwnerHome, runtime)
+	end)
 end
 
 Players.PlayerAdded:Connect(onPlayerAdded)
@@ -52,45 +47,15 @@ for _, player in Players:GetPlayers() do -- anyone who joined before this script
 end
 
 Players.PlayerRemoving:Connect(function(player)
-	wallets[player] = nil
-	cashValues[player] = nil
-	if owner == player then
-		owner = nil
-		for _, other in Players:GetPlayers() do
-			if other ~= player then
-				owner = other
-				break
-			end
-		end
+	local index = plots:release(player.UserId)
+	if index then
+		runtimes[index]:release()
 	end
-end)
-
-plot.servePrompt.Triggered:Connect(function(player)
-	if player ~= owner or not wallets[player] then
-		return
-	end
-	local sale = shop:serve()
-	if sale == nil then
-		return
-	end
-	wallets[player]:earn(sale.cash)
-	syncCash(player)
-	customers:leave(sale.customerId, plot.exit)
-	refreshQueue()
+	Sessions.stop(player)
 end)
 
 RunService.Heartbeat:Connect(function(dt)
-	if owner == nil then
-		return -- no shopkeeper, no customers
+	for _, runtime in runtimes do
+		runtime:tick(dt)
 	end
-	local events = shop:tick(dt)
-	if #events == 0 then
-		return
-	end
-	for _, event in events do
-		if event.kind == "CustomerArrived" then
-			customers:spawn(event.customerId, plot.entrance)
-		end
-	end
-	refreshQueue()
 end)

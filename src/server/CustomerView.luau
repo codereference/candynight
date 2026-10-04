@@ -73,8 +73,8 @@ local function makeModel(id: number): Model
 	return model
 end
 
-function CustomerView.new(walkSpeed: number)
-	return setmetatable({ walkSpeed = walkSpeed, customers = {} }, CustomerView)
+function CustomerView.new(walkSpeed: number, parent: Instance)
+	return setmetatable({ walkSpeed = walkSpeed, parent = parent, customers = {} }, CustomerView)
 end
 
 -- Ground-level pivot: the body part's pivot sits half a body above the ground.
@@ -119,7 +119,7 @@ function CustomerView:spawn(id: number, at: CFrame)
 		model:PivotTo(value)
 	end)
 	model:PivotTo(driver.Value)
-	model.Parent = workspace
+	model.Parent = self.parent
 	self.customers[id] = { model = model, driver = driver }
 end
 
@@ -145,6 +145,18 @@ function CustomerView:leave(id: number, exit: CFrame)
 		customer.driver:Destroy()
 		self.customers[id] = nil
 	end)
+end
+
+-- Removes every customer at once (the plot was freed).
+function CustomerView:clear()
+	for id, customer in self.customers do
+		if customer.tween then
+			customer.tween:Cancel()
+		end
+		customer.model:Destroy()
+		customer.driver:Destroy()
+		self.customers[id] = nil
+	end
 end
 
 return CustomerView
